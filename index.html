@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Мюнхен для Лизы</title>
+<meta name="robots" content="noindex,nofollow">
+<style>:root{color-scheme:light dark;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,600;0,800;1,600&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: паспорт путешественника. Печати города собираются на страницах-остановках, из букв складывается слово. */
+:root{
+  --bg:#eef1f6; --surface:#ffffff; --surface2:#e6ebf3; --ink:#141a24; --muted:#586377; --line:#d3dae6;
+  --blue:#0b64ad; --on-blue:#ffffff; --gold:#c79a12; --gold-soft:#f5e6b8; --on-gold:#221900;
+  --ok:#1b7a4b; --ok-soft:#d8f0e3; --bad:#b3372c; --bad-soft:#f8dcd8;
+  --font-display:'Alegreya',Georgia,serif; --font-body:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1118; --surface:#151c27; --surface2:#1d2634; --ink:#e8edf4; --muted:#9aa6ba; --line:#2a3546;
+  --blue:#5cadea; --on-blue:#04121f; --gold:#e5b73d; --gold-soft:#3a3010; --on-gold:#1d1600;
+  --ok:#4cc38a; --ok-soft:#14352a; --bad:#f07a6e; --bad-soft:#3d1c19; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0c1118; --surface:#151c27; --surface2:#1d2634; --ink:#e8edf4; --muted:#9aa6ba; --line:#2a3546;
+  --blue:#5cadea; --on-blue:#04121f; --gold:#e5b73d; --gold-soft:#3a3010; --on-gold:#1d1600;
+  --ok:#4cc38a; --ok-soft:#14352a; --bad:#f07a6e; --bad-soft:#3d1c19; color-scheme:dark;}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:640px;margin-inline:auto;padding-inline:16px;padding-block:0 96px}
+h1,h2,h3{font-family:var(--font-display);line-height:1.12;margin:0;text-wrap:balance;letter-spacing:-.005em}
+p{margin:0}
+a{color:var(--blue)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+/* ромбы баварского флага */
+.rauten{height:22px;background-color:#fff;background-image:
+  linear-gradient(135deg,#0098d4 25%,transparent 25%),linear-gradient(225deg,#0098d4 25%,transparent 25%),
+  linear-gradient(315deg,#0098d4 25%,transparent 25%),linear-gradient(45deg,#0098d4 25%,transparent 25%);
+  background-size:22px 22px;background-position:-11px 0,-11px 0,0 0,0 0;border-radius:3px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-inline:-16px;padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar b{font-family:var(--font-display);font-size:19px;font-weight:800}
+.score{display:flex;gap:14px;font-family:var(--font-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.score span b{font-family:var(--font-mono);font-size:13px;color:var(--ink);font-weight:500}
+
+.hero{padding-top:20px;display:grid;gap:14px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.hero h1{font-size:clamp(38px,11vw,58px);font-weight:800}
+.hero h1 em{font-style:italic;font-weight:600;color:var(--blue)}
+.lead{font-size:17px;max-width:60ch}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;margin-top:16px}
+.card h2{font-size:24px}
+.card h3{font-size:19px}
+.sub{color:var(--muted);font-size:14px}
+.steps{display:grid;gap:8px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:flex;gap:10px;counter-increment:s}
+.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--blue);color:var(--on-blue);
+  font:500 13px/24px var(--font-mono);text-align:center}
+
+.word{display:flex;flex-wrap:wrap;gap:6px 6px;align-items:center}
+.slot{width:32px;height:42px;border-radius:6px;border:1.5px dashed var(--line);display:grid;place-items:center;
+  font:800 24px var(--font-display);color:var(--muted)}
+.slot.on{border:1.5px solid var(--gold);background:var(--gold-soft);color:var(--ink)}
+.gap{width:14px}
+
+.mapwrap{border-radius:10px;background:var(--surface2);overflow:hidden}
+.map{display:block;width:100%;height:auto}
+.map .route{fill:none;stroke:var(--blue);stroke-width:2;stroke-dasharray:5 5;opacity:.6}
+.map .dot circle{fill:var(--surface);stroke:var(--blue);stroke-width:2.2}
+.map .dot text{fill:var(--blue);font:500 11px var(--font-mono);text-anchor:middle;dominant-baseline:central}
+.map .dot.done circle{fill:var(--blue)}
+.map .dot.done text{fill:var(--on-blue)}
+.map .dot.bonus circle{stroke-dasharray:3 2;stroke:var(--gold)}
+.map .dot.bonus text{fill:var(--gold)}
+.map .dot.bonus.done circle{fill:var(--gold);stroke:var(--gold)}
+.map .dot.bonus.done text{fill:var(--on-gold)}
+.map .dot{cursor:pointer}
+.map .n{fill:var(--muted);font:500 10px var(--font-mono)}
+
+.list{display:grid;gap:8px;margin-top:4px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;width:100%;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px 10px 10px}
+.row:hover{border-color:var(--blue)}
+.row .t{min-width:0}
+.row .t b{display:block;font-family:var(--font-display);font-size:19px;line-height:1.15}
+.row .t small{display:block;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.pill{font:500 12px var(--font-mono);padding:3px 9px;border-radius:99px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.go{background:var(--gold-soft);color:var(--ink)}
+.h2s{font-size:26px;margin-top:28px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:10px;
+  border:1.5px solid var(--blue);background:var(--blue);color:var(--on-blue);font-weight:600;text-decoration:none;text-align:center}
+.btn.ghost{background:transparent;color:var(--blue)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.back{background:none;border:0;padding:14px 0 6px;color:var(--blue);font-weight:600}
+
+.stop-head{display:grid;gap:8px;padding-top:4px}
+.stop-head h1{font-size:clamp(32px,9vw,44px);font-weight:800}
+.de{font-family:var(--font-display);font-style:italic;font-size:19px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 12px var(--font-mono);padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.lock{border-style:dashed;color:var(--muted);text-align:center;padding:26px 18px}
+
+.story{display:grid;gap:12px;max-width:62ch}
+.story p{font-size:17px}
+.timeline{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--line);display:grid;gap:12px}
+.timeline li{position:relative;display:grid;gap:2px}
+.timeline li::before{content:"";position:absolute;left:-21px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.timeline b{font:500 13px var(--font-mono);color:var(--muted)}
+.fact{background:var(--gold-soft);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--ink)}
+.fact b{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+
+.task{border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px;background:var(--surface)}
+.task.ok{border-color:var(--ok);background:var(--ok-soft)}
+.kind{font:500 11px var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.task.ok .kind{color:var(--ok)}
+.q{font-size:17px;font-weight:500}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface)}
+.opt:hover:not([disabled]){border-color:var(--blue)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft);text-decoration:line-through;opacity:.8}
+.opt.good{border-color:var(--ok);background:var(--ok-soft);font-weight:600}
+.why{font-size:15px;color:var(--ink)}
+.field{display:flex;gap:8px;flex-wrap:wrap}
+.field input[type=text]{flex:1 1 180px;min-width:0;min-height:46px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.msg{font-size:14px;color:var(--bad)}
+.hint{font-size:14px;background:var(--surface2);padding:8px 12px;border-radius:8px}
+.linkbtn{background:none;border:0;padding:0;color:var(--blue);text-decoration:underline;font-size:14px;justify-self:start}
+.shot{width:100%;max-height:320px;object-fit:cover;border-radius:10px;display:block;border:1px solid var(--line)}
+video.shot{object-fit:contain;background:#000}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.up:focus-within{outline:3px solid var(--blue);outline-offset:2px}
+
+.reward{display:grid;justify-items:center;gap:8px;text-align:center;padding:22px 18px}
+.stamp{color:var(--blue);display:block}
+.stamp.off{color:var(--muted);opacity:.55}
+.stamp.pop{animation:thump .55s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes thump{0%{transform:scale(2.2) rotate(-14deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+.stamp text{font-family:var(--font-display);fill:currentColor}
+.stamp .mono{font-family:var(--font-mono)}
+.audio,.rec{display:grid;gap:8px}
+.audio audio{width:100%}
+.rec{border:1px dashed var(--line);border-radius:10px;padding:12px}
+.letter-note{font-size:15px;color:var(--muted)}
+
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.album figure{margin:0;display:grid;gap:6px}
+.album img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.album figcaption{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+
+.cert{text-align:center;border:2px solid var(--gold);border-radius:16px;padding:26px 18px;background:var(--surface);display:grid;gap:14px;justify-items:center}
+.cert h1{font-size:clamp(32px,9vw,46px);font-weight:800}
+.cert .stamps{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.note{font-size:17px;max-width:46ch;font-family:var(--font-display);font-style:italic}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;max-width:calc(100vw - 32px);z-index:9;transition:.25s;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.stamp.pop{animation:none}.toast{transition:none}}
+</style>
+
+<div class="app" id="app"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============ СОДЕРЖАНИЕ ============ */
+const HERO_NAME = `Лиза`;
+const HERO_GEN = `Лизы`;
+const GIFT = `Футболка ФК «Бавария»`;
+const FINAL_NOTE = `Ты прошла город, который основали 870 с лишним лет назад, и не потерялась ни на одной улице. Servus, Лиза: по-баварски это и «привет», и «пока». Но теперь ты знаешь Мюнхен достаточно хорошо, чтобы вернуться сюда в любой день.`;
+
+const STOPS = [
+{id:'s1',n:1,letter:'S',name:`Карлстор и Штахус`,de:`Karlstor · Karlsplatz (Stachus)`,lat:48.13915,lon:11.5661,mapQ:`Karlstor München`,min:15,best:`в любое время`,
+ riddle:`Две круглые каменные башни и арка между ними. Это западные ворота старого города. Перед ними огромная площадь с фонтанами, а под ногами метро.`,
+ way:`Старт от отеля: от Dachauer Straße иди к площади Karlsplatz (Stachus), это около 10 минут пешком. Повернись лицом к воротам.`,
+ story:[
+  `Мюнхен родился в 1158 году. Герцог Генрих Лев разрушил мост епископа Фрайзинга на Изаре, построил свой собственный и заставил караваны с солью идти через новый рынок. Так поселение «у монахов» (bei den Munichen) стало городом.`,
+  `Потом город обнесли стеной. От неё остались Карлстор, готические западные ворота около 1302 года. Площадь перед ними все называют Штахус: в XVIII веке тут стоял трактир хозяина по имени Эустахиус Фёдерль, которого прозвали Stachus.`,
+  `Сегодня под площадью огромный подземный торговый центр и станция метро, а ворота по-прежнему стоят на страже старого города.`],
+ timeline:[[`1158`,`Генрих Лев основывает Мюнхен`],[`ок. 1302`,`Строят ворота во второй городской стене`],[`конец XVIII в.`,`Курфюрст Карл Теодор сносит укрепления, площадь и ворота получают его имя`]],
+ fact:`Маленький монах в чёрно-золотой одежде — Münchner Kindl, «мюнхенское дитя» — до сих пор главный символ города. Чёрный и золотой это цвета Мюнхена, а бело-голубые ромбы, как в шапке страницы, цвета Баварии.`,
+ links:{yt:`Карлстор Мюнхен история Штахус`,wiki:`Карлстор Мюнхен`},
+ tasks:[
+  {id:'q',type:'quiz',q:`Что означает название «München»?`,opts:[`«У монахов»`,`«Солёный мост»`,`«Город льва»`,`«Мельничная река»`],a:0,why:`Верно. По-старонемецки «bei den Munichen», то есть «у монахов». Поэтому на гербе монах.`},
+  {id:'t',type:'text',q:`Местные называют эту площадь не Карлсплац, а иначе. Как? (одно слово, можно по-русски)`,re:/(штахус|стахус|stachus)/i,hint:`Так прозвали трактирщика Эустахиуса Фёдерля.`,why:`Да, Штахус.`},
+  {id:'p',type:'photo',q:`Фото «Ворота в прошлое»: встань спиной к Карлстору так, чтобы арка была над твоим плечом, и сделай селфи.`},
+  {id:'v',type:'video',q:`Видео на 10 секунд: пройди сквозь арку и скажи в камеру: «Привет, Мюнхен! Я Лиза, и сегодня я беру этот город».`}]},
+
+{id:'s2',n:2,letter:'E',name:`Церковь Святого Михаила`,de:`St. Michael · Michaelskirche`,lat:48.13925,lon:11.5702,mapQ:`Michaelskirche München`,min:20,best:`в воскресенье идут службы, осмотр во время мессы ограничен`,
+ riddle:`Самая большая ренессансная церковь к северу от Альп. Над порталом бронзовый воин с копьём, а внутри сводчатый потолок как у римского собора.`,
+ way:`От Карлстора иди на восток по пешеходной Neuhauser Straße. Через 300 метров слева появится высокий фасад с фигурой над входом.`,
+ story:[
+  `Герцог Вильгельм V начал строить эту церковь в 1583 году. Она была главным храмом иезуитов и оружием Контрреформации: Бавария оставалась католической, и герцог хотел, чтобы это было видно всем.`,
+  `В 1590 году недостроенная башня обрушилась, и проект пришлось менять. Церковь освятили в 1597-м. Свод главного зала шириной около 20 метров считается вторым по размеру в мире после собора Святого Петра в Риме.`,
+  `Вильгельм потратил на стройку так много, что казна опустела. В том же 1597 году он отрёкся от власти в пользу сына Максимилиана. В крипте лежат десятки Виттельсбахов, среди них самый известный, Людвиг II, король-сказочник.`],
+ timeline:[[`1583`,`Закладка церкви`],[`1590`,`Обрушивается башня`],[`1597`,`Освящение. Вильгельм V отрекается`],[`1944`,`Тяжёлые бомбёжки, затем восстановление`]],
+ fact:`Людвиг II построил замок Нойшванштайн, а в 1886 году загадочно погиб в озере Штарнберг. Его крипта здесь, и к ней всегда кладут свежие цветы.`,
+ links:{yt:`Михаэлькирхе Мюнхен церковь Людвиг II`,wiki:`Церковь Святого Михаила Мюнхен`},
+ tasks:[
+  {id:'q',type:'quiz',q:`Кто из знаменитых людей лежит в крипте Михаэлькирхе?`,opts:[`Наполеон`,`Людвиг II, король-сказочник`,`Моцарт`,`Бисмарк`],a:1,why:`Да. Людвиг II Баварский покоится в крипте рядом с другими Виттельсбахами.`},
+  {id:'t',type:'text',q:`Над порталом архангел Михаил побеждает кого? (одно слово)`,re:/(дьявол|дьяво|сатан|дракон|змей|змия|лукав|зл)/i,hint:`Посмотри у ног Михаила: там тёмная поверженная фигура. Кто обычно проигрывает ангелам?`,why:`Михаил побеждает дьявола. Это любимый сюжет Контрреформации.`},
+  {id:'p',type:'photo',q:`Найди на фасаде фигуру Михаила и сними её крупным планом. Зум в помощь.`},
+  {id:'v',type:'video',q:`Зайди внутрь (вход свободный, говори тихо) и медленно сними свод: начни с алтаря и подними телефон вверх. 15 секунд. Шёпотом скажи: «второй по ширине свод после Рима».`}]},
+
+{id:'s3',n:3,letter:'R',name:`Фрауэнкирхе`,de:`Frauenkirche · Dom zu Unserer Lieben Frau`,lat:48.13865,lon:11.5737,mapQ:`Frauenkirche München`,min:25,best:`в воскресенье идут службы, внутрь тихо`,
+ riddle:`Две одинаковые башни с куполами-«луковицами» видны почти из любой точки города. Внутри, у самого входа, в каменном полу спрятан след.`,
+ way:`Ещё 250 метров по той же улице. Справа, за площадью Frauenplatz, поднимаются две башни из красного кирпича.`,
+ story:[
+  `Главный собор Мюнхена построен из кирпича: на камень у города не хватало денег. Строили быстро, с 1468 по 1488 год, по проекту Йорга фон Хальсбаха. Купола-«луковицы» на башнях появились позже, около 1525 года.`,
+  `Башни высотой около 99 метров. В 2004 году жители Мюнхена проголосовали на референдуме: новые здания в центре не должны быть выше башен Фрауэнкирхе. Поэтому город выглядит так, как выглядит.`,
+  `Легенда: Хальсбах заключил с дьяволом сделку и обещал построить церковь без окон. Дьявол заглянул от входа и увидел лес колонн, за которыми окон не было видно, и остался доволен. А когда зашёл глубже и увидел свет из окон, он в ярости топнул ногой. След остался до сих пор.`],
+ timeline:[[`1468`,`Начало строительства`],[`1488`,`Главное здание готово`],[`ок. 1525`,`Башни получают купола-«луковицы»`],[`1821`,`Церковь становится кафедральным собором`]],
+ fact:`В соборе похоронен император Людвиг Баварский, тот самый, что построил Изарские ворота (они у нас в бонусе).`,
+ links:{yt:`Фрауэнкирхе Мюнхен след дьявола Teufelstritt`,wiki:`Фрауэнкирхе Мюнхен`},
+ tasks:[
+  {id:'q',type:'quiz',q:`Какой высоты башни Фрауэнкирхе? Именно этот предел жители выбрали для центра города.`,opts:[`около 66 м`,`около 99 м`,`около 123 м`,`около 150 м`],a:1,why:`Около 99 метров. Референдум 2004 года защитил силуэт собора.`},
+  {id:'c',type:'check',q:`Зайди в притвор у входа и найди тёмный след в полу («Teufelstritt»). Встань в него и посмотри вперёд: окон не видно, их закрывают колонны. Проверила?`},
+  {id:'p',type:'photo',q:`Фото следа дьявола. Поставь рядом ногу для масштаба.`},
+  {id:'v',type:'video',q:`Расскажи легенду о дьяволе своими словами, как сказочница. 30 секунд, можно смешно.`}]},
+
+{id:'s4',n:4,letter:'V',name:`Мариенплац`,de:`Marienplatz · Neues Rathaus`,lat:48.13745,lon:11.5755,mapQ:`Marienplatz München`,min:30,best:`куранты в 11:00, 12:00 и в октябре ещё в 17:00`,
+ riddle:`Золотая Дева на колонне, готическая ратуша как каменное кружево и толпа с запрокинутыми головами. Значит, сейчас играют куранты.`,
+ way:`Продолжай по Kaufingerstraße ещё 250 метров: улица выходит на главную площадь города. Café Glockenspiel на Marienplatz: ешьте так, чтобы к 12:00 сидеть у окна.`,
+ story:[
+  `Сердце города. Когда-то здесь был рынок зерна, а площадь называли Schrannenplatz. Своё нынешнее имя она получила в 1854 году по колонне со статуей Девы Марии, которую в 1638 году поставил курфюрст Максимилиан I в благодарность за то, что Мюнхен пережил Тридцатилетнюю войну. У подножия четыре путти борются с чудовищами, символами чумы, голода, войны и ереси.`,
+  `Новая ратуша построена в 1867–1908 годах архитектором Георгом Хауберриссером. Она выглядит как готический собор, хотя на деле ей около ста пятидесяти лет. В башне куранты: 43 колокола и 32 фигуры в натуральную величину.`,
+  `Верхний ярус показывает свадьбу герцога Вильгельма V и Ренаты Лотарингской в 1568 году и рыцарский турнир: баварский рыцарь побеждает соперника из Лотарингии. Нижний ярус показывает танец бочаров (Schäfflertanz). По легенде, этот танец после эпидемии чумы вывел людей из домов на улицу. Заканчивается шоу золотым петухом на вершине.`],
+ timeline:[[`1158`,`Здесь возникает рынок города`],[`1638`,`Поставлена колонна с Девой Марией`],[`1854`,`Площадь получает имя Marienplatz`],[`1908`,`Завершена Новая ратуша, куранты играют`]],
+ fact:`В Пепельную среду, в начале Великого поста, в фонтане Fischbrunnen по традиции моют кошельки, чтобы они не пустовали весь год. А когда футбольная «Бавария» выигрывает трофей, игроки выходят показывать его горожанам на балкон Новой ратуши, и вся площадь становится красно-белой.`,
+ links:{yt:`Глокеншпиль Мюнхен Мариенплац куранты`,wiki:`Мариенплац`},
+ tasks:[
+  {id:'q',type:'quiz',q:`Сколько колоколов в курантах Новой ратуши?`,opts:[`23`,`43`,`61`,`99`],a:1,why:`43 колокола и 32 фигуры. Это один из крупнейших глокеншпилей Германии.`},
+  {id:'t',type:'text',q:`Верхний ярус показывает свадьбу герцога Вильгельма V. Из какого региона была невеста Рената? (по-русски)`,re:/(лотаринг|lorrain|lothring)/i,hint:`Это регион между Францией и Германией. Он есть в истории ярусов курантов выше.`,why:`Рената Лотарингская. Баварский рыцарь на курантах всегда побеждает.`},
+  {id:'c',type:'check',q:`Найди золотую Деву Марию на колонне и четырёх путти у её подножия. Заметила чудовищ?`},
+  {id:'p',type:'photo',q:`Сфотографируй башню Новой ратуши так, чтобы она поместилась целиком.`},
+  {id:'v',type:'video',q:`Видео 30 секунд: к 12:00 вы будете обедать в Café Glockenspiel, прямо над площадью. Сними куранты оттуда, из окна или с террасы, и скажи, кто побеждает на турнире.`}]},
+
+{id:'s5',n:5,letter:'U',name:`Старый Пётр`,de:`Alter Peter · Peterskirche`,lat:48.1363,lon:11.5764,mapQ:`Peterskirche München`,min:30,best:`на башню поднимаются в ясную погоду`,
+ riddle:`Самая старая приходская церковь города стоит на холме, с которого всё и началось. Её башню называют просто «Старый Пётр».`,
+ way:`С Мариенплац иди на юг по Rindermarkt. Высокая узкая башня перед тобой — Alter Peter.`,
+ story:[
+  `До 1158 года на этом холме уже стояла церковь, вокруг жили монахи, давшие городу имя. Поэтому Мюнхен и начинается отсюда.`,
+  `В башне высотой около 91 метра 306 ступенек. Наверху смотровая площадка: в ясные дни («Föhn») отсюда видны Альпы.`,
+  `Внутри в застеклённом саркофаге лежит скелет святой Мундиции в одеянии, расшитом драгоценностями. Это неожиданно и очень по-барочному красиво. В 1944 году церковь сильно пострадала от бомбёжек и восстанавливалась десятилетиями.`],
+ timeline:[[`до 1158`,`На холме уже есть церковь и монахи`],[`1944`,`Сильные разрушения в войну`],[`после войны`,`Долгое восстановление башни и храма`]],
+ fact:`Мюнхенцы говорят «Alter Peter» почти ласково: для них это башня, с которой начался город.`,
+ links:{yt:`Петеркирхе Мюнхен Alter Peter башня`,wiki:`Церковь Святого Петра Мюнхен`},
+ tasks:[
+  {id:'q',type:'quiz',q:`Сколько ступенек на башне Alter Peter?`,opts:[`106`,`206`,`306`,`406`],a:2,why:`306 ступенек, высота башни около 91 метра.`},
+  {id:'t',type:'text',q:`Зайди внутрь и найди скелет в драгоценностях в стеклянном саркофаге. Как зовут святую? (имя)`,re:/(мундиц|мунди|munditia|mundit)/i,hint:`Имя начинается на «Мунд».`,why:`Святая Мундиция.`},
+  {id:'p',type:'photo',q:`Фото: башня Alter Peter, снятая снизу так, чтобы она упиралась в небо.`},
+  {id:'v',type:'video',q:`Если залезешь на башню: панорама крыш и Альп. Если нет: запиши, как ты вслух считаешь первые 20 ступенек где-нибудь поблизости.`}]},
+
+{id:'s6',n:6,letter:'S',name:`Рынок Виктуалиенмаркт`,de:`Viktualienmarkt`,lat:48.1352,lon:11.5766,mapQ:`Viktualienmarkt München`,min:30,best:`по воскресеньям лотки обычно закрыты`,
+ riddle:`Рынок, название которого происходит от латинского слова «провизия». Здесь киоски, зонты, запах еды и пивной сад.`,
+ way:`Спустись с холма от Peterskirche. Рынок прямо за ним. Если лотки закрыты, не страшно.`,
+ story:[
+  `В 1807 году король Максимилиан I Иосиф перенёс рынок с Мариенплац сюда: на старой площади стало тесно. Так появился Виктуалиенмаркт. Он и сегодня один из главных в Европе.`,
+  `В центре стоит майское дерево, бело-голубой столб с фигурками ремёсел и торговцев. Рядом фонтан Карла Валентина (1953) и фонтан в честь его напарницы Лизль Карлштадт. Валентин был комиком, которого любил весь город.`,
+  `По воскресеньям лотки обычно закрыты. Зато можно спокойно рассмотреть площадь без толпы и вернуться сюда в будний день утром за едой.`,
+  `Главная гастрономическая традиция: Weißwurst, белая телячья колбаса, которую едят с крендельком и сладкой горчицей, по возможности до полудня.`],
+ timeline:[[`1807`,`Рынок переносят на нынешнее место`],[`1953`,`Появляется фонтан Карла Валентина`]],
+ fact:`Лизль Карлштадт на самом деле звали Элизабет. Она была второй половиной юмористического дуэта с Валентином, и оба любили Мюнхен.`,
+ links:{yt:`Виктуалиенмаркт Мюнхен рынок Weißwurst`,wiki:`Виктуалиенмаркт`},
+ tasks:[
+  {id:'q',type:'quiz',q:`До какого времени по традиции надо съесть Weißwurst?`,opts:[`До полудня`,`После заката`,`Только зимой`,`Только с пивом`],a:0,why:`Верно: «Weißwurst не должна слышать полуденный колокол». Раньше не было холодильников.`},
+  {id:'t',type:'text',q:`Найди на майском дереве одну фигурку ремесла или торговли и напиши, что она изображает.`,re:/.{2,}/,hint:`Пекарь, мясник, пивовар, бондарь, садовник. Смотри на картинки по бокам столба.`,why:`Хорошая находка.`},
+  {id:'c',type:'check',q:`Найди майское дерево со знаками ремёсел и один из фонтанов Карла Валентина. Нашла?`},
+  {id:'p',type:'photo',q:`Фото: майское дерево или самая красивая вывеска, которая попадётся.`},
+  {id:'v',type:'video',q:`Проведи экскурсию для пустого рынка: 20 секунд в духе «Вот здесь по будням кипит жизнь». Закончи фразой «Я вернусь за Weißwurst».`}]},
+
+{id:'s7',n:7,letter:'L',name:`Резиденция Виттельсбахов`,de:`Münchner Residenz · Max-Joseph-Platz`,lat:48.14085,lon:11.5787,mapQ:`Münchner Residenz`,min:30,best:`музей в воскресенье открыт днём, дворы и львы всегда`,
+ riddle:`Самый большой городской дворец Германии. У главного портала на улице стоят бронзовые львы, и их блестящие части отполированы тысячами ладоней.`,
+ way:`Вернись к Marienplatz и иди на север по Dienerstraße к театру с колоннами (Max-Joseph-Platz), около 10 минут. Портал Residenz со львами на Residenzstraße.`,
+ story:[
+  `Начиная с 1385 года здесь жили герцоги, курфюрсты и короли Баварии. Дворец начинали как укреплённую резиденцию, а потом расширяли веками. Сегодня это самый большой городской дворец Германии, больше 130 залов и несколько дворов.`,
+  `В 1806 году по воле Наполеона Бавария стала королевством, первым королём был Максимилиан I Иосиф. Его памятник стоит на площади перед Национальным театром, построенным в 1818 году. Виттельсбахи правили Баварией с 1180 года, то есть почти 740 лет, до революции 1918 года.`,
+  `В зале Антиквариум (1568–1571) длиной около 66 метров. Это самый большой зал эпохи Возрождения к северу от Альп. Залы музея платные, зато дворы дворца можно осмотреть бесплатно.`],
+ timeline:[[`1385`,`Начало Residenz («Новая крепость»)`],[`1568–71`,`Строят Антиквариум`],[`1806`,`Бавария становится королевством`],[`1918`,`Конец монархии Виттельсбахов`]],
+ fact:`Львы у входа держат щиты. По городской примете, если потереть щит, будет удача, поэтому он и блестит.`,
+ links:{yt:`Мюнхенская резиденция Виттельсбахов Residenz`,wiki:`Мюнхенская резиденция`},
+ tasks:[
+  {id:'q',type:'quiz',q:`Сколько лет Виттельсбахи правили Баварией (с 1180 по 1918)?`,opts:[`около 100`,`около 300`,`около 740`,`около 1000`],a:2,why:`Около 740 лет. Одна из самых долгих династий Европы.`},
+  {id:'t',type:'text',q:`Что держат бронзовые львы у входа? (одно слово)`,re:/(щит|shield|schild)/i,hint:`Защитное оружие рыцарей.`,why:`Щиты. Потри один на удачу.`},
+  {id:'p',type:'photo',q:`Фото: твоя рука на щите льва.`},
+  {id:'v',type:'video',q:`Королевская походка: пройди по площади 10 секунд, как королева Баварии, и слегка поклонись подданным.`}]},
+
+{id:'s8',n:8,letter:'I',name:`Одеонсплац и золотая дорожка`,de:`Odeonsplatz · Feldherrnhalle · Theatinerkirche`,lat:48.14215,lon:11.5772,mapQ:`Feldherrnhalle München`,min:30,best:`лучше вечером, когда жёлтая церковь светится`,
+ riddle:`Лоджия с двумя львами, как во Флоренции, а рядом жёлтая барочная церковь с куполом и двумя башнями.`,
+ way:`Иди по Residenzstraße на север около 400 метров, улица выходит на просторную Odeonsplatz.`,
+ story:[
+  `Feldherrnhalle (1841–1844) по заказу Людвига I построена по образцу флорентийской Loggia dei Lanzi. Здесь чествовали баварскую армию. Жёлтая Theatinerkirche рядом итальянская по духу: курфюрстина Генриетта Аделаида Савойская дала обет построить её, когда родила долгожданного наследника. Началась стройка в 1663 году.`,
+  `Жёлтый цвет барочных фасадов в Мюнхене до сих пор называют «мюнхенским жёлтым».`,
+  `В Мюнхене есть и тёмная страница истории. Рядом с Feldherrnhalle отходит узкий проход Viscardigasse. В нацистские годы у памятника возле Feldherrnhalle требовали отдавать нацистское приветствие, и люди обходили место через этот переулок. Его называли Drückebergergasse, «переулок уклонистов». Теперь по брусчатке идёт золотая дорожка в память о тех, кто отказался подчиняться.`],
+ timeline:[[`1663`,`Начинают строить Theatinerkirche`],[`1768`,`Завершён фасад церкви`],[`1844`,`Открыта Feldherrnhalle`],[`1995`,`Золотая дорожка в Viscardigasse`]],
+ fact:`Мемориал в переулке не табличка и не статуя, а просто золотая линия под ногами. Многие туристы проходят по ней и не замечают.`,
+ links:{yt:`Одеонсплац Мюнхен Feldherrnhalle Theatinerkirche`,wiki:`Одеонсплац`},
+ tasks:[
+  {id:'q',type:'quiz',q:`По образцу какой постройки создана Feldherrnhalle?`,opts:[`Пантеон в Риме`,`Loggia dei Lanzi во Флоренции`,`Парфенон в Афинах`,`Колизей`],a:1,why:`Loggia dei Lanzi во Флоренции. Людвиг I обожал Италию.`},
+  {id:'t',type:'text',q:`Найди Viscardigasse (узкий проход рядом с Feldherrnhalle). Какого цвета линия на брусчатке?`,re:/(золот|жёлт|желт|gold)/i,hint:`Цвет королевской короны и монеты.`,why:`Золотая, в память о тех, кто сопротивлялся.`},
+  {id:'p',type:'photo',q:`Фото на ступенях Feldherrnhalle или на фоне жёлтой Theatinerkirche.`},
+  {id:'v',type:'video',q:`20 секунд: пройди по золотой дорожке Viscardigasse и скажи в камеру, в память о чём она проложена.`}]},
+
+{id:'s9',n:9,letter:'Z',name:`Хофгартен и Айсбах`,de:`Hofgarten · Englischer Garten · Eisbach`,lat:48.1433,lon:11.5794,mapQ:`Eisbachwelle München`,min:75,best:`светлое время: заход солнца около 17:00`,
+ riddle:`Сначала тихий итальянский сад с павильоном, потом огромный парк, где посреди города на речном рукаве стоят люди на досках.`,
+ way:`Арка в Hofgarten прямо на Odeonsplatz. Пройди сад и выходи на восток по Galeriestraße. Дальше к Haus der Kunst на Prinzregentenstraße, около 25 минут пешком. Волна Айсбаха у моста рядом с ним. В ночь на 25 октября часы перевели на зимнее время, темнеет рано, успей засветло.`,
+ story:[
+  `Hofgarten заложил в 1613–1617 годах курфюрст Максимилиан I рядом со своей резиденцией. Дорожки строго симметричны, сад в итальянском ренессансном стиле. В центре павильон Дианы, по краям арки.`,
+  `Английский сад основал в 1789 году курфюрст Карл Теодор, тот самый, в честь которого назван Карлстор. Это один из крупнейших городских парков мира. Он сразу задумывался как парк для всех горожан, а не только для двора.`,
+  `Через парк течёт Айсбах, искусственный рукав Изара. Возле Haus der Kunst на нём стоит постоянная волна высотой около метра. Серфят на ней с 1970-х годов. Волна коварная и для опытных, новичкам в воду лезть нельзя. Смотреть можно бесплатно, из-за ограждения, и это одно из самых необычных зрелищ Мюнхена.`],
+ timeline:[[`1613–17`,`Максимилиан I закладывает Hofgarten`],[`1789`,`Карл Теодор основывает Английский сад`],[`1970-е`,`На Айсбахе начинают серфить`]],
+ fact:`Мюнхен почти на 500 метров выше уровня моря и ближе к Альпам, чем к морю, и всё же серферы здесь есть круглый год.`,
+ links:{yt:`Айсбах Мюнхен серферы Eisbachwelle Englischer Garten`,wiki:`Английский сад Мюнхен`},
+ tasks:[
+  {id:'q',type:'quiz',q:`В каком стиле устроен Hofgarten?`,opts:[`Английский пейзажный`,`Итальянский ренессансный`,`Японский`,`Неоготический`],a:1,why:`Итальянский ренессансный: строгая симметрия и центральный павильон.`},
+  {id:'q2',type:'quiz',q:`Чьё имя носит Карлстор и кто основал Английский сад в 1789 году?`,opts:[`Карл Теодор`,`Генрих Лев`,`Людвиг II`,`Наполеон`],a:0,why:`Курфюрст Карл Теодор. Первая остановка и эта теперь связаны.`},
+  {id:'t',type:'text',q:`Сколько серферов сейчас на волне Айсбаха? (число или «никого»)`,re:/(\d|ноль|никого|нет)/i,hint:`Посчитай тех, кто в воде, и тех, кто ждёт очереди на берегу, отдельно.`,why:`Записано.`},
+  {id:'c',type:'check',q:`Найди в Hofgarten павильон Дианы в центре сада. Нашла?`},
+  {id:'p',type:'photo',q:`Фото серфера на волне. Или вы вдвоём спиной к Айсбаху.`},
+  {id:'v',type:'video',q:`Видео 15 секунд: сними серфера на волне и прокомментируй, как спортивный комментатор.`}]},
+
+{id:'s10',n:10,letter:'A',name:`Хофбройхаус`,de:`Hofbräuhaus am Platzl`,lat:48.13765,lon:11.5797,mapQ:`Hofbräuhaus München`,min:45,best:`ужин 17:30–18:00, потом музыка и атмосфера`,
+ riddle:`Самая знаменитая пивная мира. Гудят сотни голосов, играет оркестр, а на вывеске две буквы: HB.`,
+ way:`От Айсбаха вернись в центр к площади Platzl: около 25–30 минут пешком или на городском транспорте. Здание с вывеской «HB» трудно пропустить.`,
+ story:[
+  `В 1516 году герцог Вильгельм IV издал закон о чистоте пива (Reinheitsgebot): варить можно было только из воды, ячменя и хмеля. Про дрожжи тогда ещё не знали.`,
+  `В 1589 году Вильгельм V (тот самый, что построил Михаэлькирхе) основал придворную пивоварню Hofbräuhaus. Пиво для двора варили здесь, а обычные горожане попали внутрь только в 1828 году, когда король Людвиг I открыл заведение для всех.`,
+  `Нынешнее здание построено в 1897 году. Главный тост: «Ein Prosit der Gemütlichkeit!», «За уют!». Пиво подают в литровых кружках Maß.`],
+ timeline:[[`1516`,`Закон о чистоте пива`],[`1589`,`Вильгельм V основывает Hofbräuhaus`],[`1828`,`Пивная открыта для всех горожан`],[`1897`,`Строится нынешнее здание`]],
+ fact:`Октоберфест родился в 1810 году: поводом стала свадьба наследного принца Людвига и Терезы. Праздник понравился горожанам, и его устраивают до сих пор.`,
+ links:{yt:`Хофбройхаус Мюнхен история Hofbräuhaus`,wiki:`Хофбройхаус`},
+ tasks:[
+  {id:'q',type:'quiz',q:`Что по закону 1516 года разрешено добавлять в пиво?`,opts:[`Вода, ячменный солод и хмель`,`Вода, пшеница и мёд`,`Вода и дрожжи`,`Вода, сахар и хмель`],a:0,why:`Верно: вода, ячмень и хмель. Дрожжи в список попали позже, когда их открыли.`},
+  {id:'q2',type:'quiz',q:`Сколько литров в баварской кружке Maß?`,opts:[`0,5`,`1`,`1,5`,`2`],a:1,why:`Один литр. Полная кружка тяжёлая, и руки у официанток крепкие.`},
+  {id:'p',type:'photo',q:`Финальное фото: вы вдвоём под сводами зала. Найди что-нибудь расписное на потолке.`},
+  {id:'v',type:'video',q:`Тост на камеру: подними стакан (лимонад подойдёт!) и скажи «Ein Prosit der Gemütlichkeit!». Это финал, скажи ещё «Servus, Мюнхен!»`}]}
+];
+
+const BONUS = [
+{id:'b1',n:'★1',bonus:true,name:`Изарские ворота`,de:`Isartor`,lat:48.1340,lon:11.5829,mapQ:`Isartor München`,min:20,best:`по пути от Виктуалиенмаркта`,
+ riddle:`Восточные ворота старого города, по которым можно выйти к реке Изар.`,
+ way:`Бонус. От Виктуалиенмаркта иди на восток около 700 метров.`,
+ story:[`Ворота построили в 1337 году по приказу Людвига Баварского. На фреске над аркой император Людвиг едет после победы при Мюльдорфе (1322). В башне сегодня музей Карла Валентина и Лизль Карлштадт.`],
+ timeline:[[`1337`,`Строят ворота`]],fact:`Людвиг Баварский похоронен во Фрауэнкирхе, так что сегодня ты его уже видела.`,
+ links:{yt:`Изартор Мюнхен ворота`,wiki:`Изартор`},
+ tasks:[{id:'q',type:'quiz',q:`По какой реке названы Изарские ворота?`,opts:[`Инн`,`Изар`,`Рейн`,`Дунай`],a:1,why:`Изар, та самая река, через которую Генрих Лев построил мост.`},{id:'p',type:'photo',q:`Фото ворот с фреской.`}]},
+{id:'b2',n:'★2',bonus:true,name:`Асамкирхе`,de:`Asamkirche · Sendlinger Straße`,lat:48.1343,lon:11.5693,mapQ:`Asamkirche München`,min:20,best:`по пути обратно к метро`,
+ riddle:`Крохотная церковь, где на квадратный метр приходится больше золота и лепнины, чем во многих дворцах.`,
+ way:`Бонус. От Карлстора или Мариенплац по Sendlinger Straße.`,
+ story:[`Братья Космас Дамиан и Эгид Квирин Азам, лучшие мастера баварского барокко, построили её в 1733–1746 годах для себя и рядом поставили собственный дом. Церковь частная, не для герцога. Внутри всё золото, лепнина, игра света и фрески.`],
+ timeline:[[`1733–46`,`Братья Азам строят церковь и дом`]],fact:`Церковь втиснута между обычными домами, и с улицы её легко пропустить.`,
+ links:{yt:`Асамкирхе Мюнхен`,wiki:`Асамкирхе`},
+ tasks:[{id:'q',type:'quiz',q:`Кем были братья Азам?`,opts:[`Придворными поварами`,`Мастерами барокко: живописцем и скульптором`,`Герцогами`,`Монахами`],a:1,why:`Один был живописцем, другой скульптором и лепщиком, и вместе они построили церковь для себя.`},{id:'p',type:'photo',q:`Фото внутри, найди золотой алтарь. Без вспышки!`}]}
+];
+
+const ALL = [...STOPS, ...BONUS];
+const WORD = STOPS.map(s=>s.letter);
+const KINDS = {quiz:'Вопрос',text:'Ответ словами',check:'Найди и отметь',photo:'Фото-задание',video:'Видео-задание'};
+const PTS = {quiz:10,text:10,check:5,photo:15,video:20};
+const STAMP_PTS = 10;
+
+/* ============ СОСТОЯНИЕ ============ */
+const KEY='lizaMunich.v1';
+let st={prog:{},final:false};
+let view={name:'home',id:null};
+const hints={}, vids={}, pop={};
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.prog)st=o;}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+function P(id){return st.prog[id]||(st.prog[id]={arrived:false,t:{}});}
+function required(s){return s.tasks.filter(t=>t.type!=='video');}
+function complete(s){const p=P(s.id);return required(s).every(t=>p.t[t.id]&&p.t[t.id].ok);}
+function points(){let n=0;for(const s of ALL){const p=P(s.id);for(const k in p.t){if(p.t[k]&&p.t[k].pts)n+=p.t[k].pts;}if(complete(s))n+=STAMP_PTS;}return n;}
+function maxPoints(){let n=0;for(const s of STOPS){for(const t of s.tasks)n+=PTS[t.type];n+=STAMP_PTS;}return n;}
+function stampsDone(){return STOPS.filter(complete).length;}
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function ico(n){return n;}
+
+/* ============ ОТРИСОВКА ============ */
+function stamp(n,letter,done,size,anim){
+  const rot=[-9,6,-4,8,-7,5,-10,4,-6,9][(String(n).replace(/\D/g,'')-1)%10]||0;
+  return `<svg class="stamp ${done?'on':'off'} ${anim?'pop':''}" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="${done?'Печать '+letter:'Печать не получена'}">
+  <g transform="rotate(${rot} 50 50)">
+  <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="3"${done?'':' stroke-dasharray="4 5"'}/>
+  <circle cx="50" cy="50" r="39" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text class="mono" x="50" y="29" text-anchor="middle" font-size="9" letter-spacing="1.5">№ ${esc(n)}</text>
+  <text x="50" y="66" text-anchor="middle" font-weight="800" font-size="40">${done?esc(letter):'?'}</text>
+  <text class="mono" x="50" y="82" text-anchor="middle" font-size="7" letter-spacing="2">MÜNCHEN</text></g></svg>`;
+}
+
+function mapSVG(){
+  const W=360,H=330,pad=28,k=Math.cos(48.14*Math.PI/180);
+  const lats=ALL.map(s=>s.lat),lons=ALL.map(s=>s.lon);
+  const la0=Math.max(...lats),lo0=Math.min(...lons);
+  const dLat=la0-Math.min(...lats),dLon=(Math.max(...lons)-lo0)*k;
+  const S=Math.min((W-2*pad)/dLon,(H-2*pad)/dLat);
+  const ox=(W-dLon*S)/2,oy=(H-dLat*S)/2;
+  const pos=s=>[ox+(s.lon-lo0)*k*S,oy+(la0-s.lat)*S];
+  const pts=STOPS.map(s=>pos(s).join(',')).join(' ');
+  const dots=ALL.map(s=>{const [x,y]=pos(s);const d=complete(s);
+    return `<g class="dot ${d?'done':''} ${s.bonus?'bonus':''}" data-act="open" data-id="${s.id}" role="button" tabindex="0" aria-label="${esc(s.name)}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="11"/><text x="${x.toFixed(1)}" y="${y.toFixed(1)}">${s.bonus?'★':s.n}</text></g>`;}).join('');
+  return `<svg class="map" viewBox="0 0 ${W} ${H}" role="img" aria-label="Схема маршрута по центру Мюнхена"><polyline class="route" points="${pts}"/>${dots}<text class="n" x="${W-14}" y="22" text-anchor="end">N ↑</text><text class="n" x="14" y="${H-10}">схема, не в точном масштабе</text></svg>`;
+}
+
+function rowHTML(s){
+  const d=complete(s),p=P(s.id),started=p.arrived||Object.keys(p.t).length;
+  return `<button class="row" data-act="open" data-id="${s.id}">${stamp(s.bonus?s.n:s.n,s.letter||'★',d,54,false)}<span class="t"><b>${esc(s.name)}</b><small>${esc(s.de)}</small></span><span class="pill ${d?'ok':started?'go':''}">${d?'готово':started?'в пути':s.min+' мин'}</span></button>`;
+}
+
+function home(){
+  const done=stampsDone(),pts=points();
+  const slots=WORD.map((l,i)=>{const on=complete(STOPS[i]);return (i===6?'<span class="gap"></span>':'')+`<span class="slot ${on?'on':''}">${on?l:'?'}</span>`;}).join('');
+  return `
+  <div class="hero">
+    <div class="rauten" aria-hidden="true"></div>
+    <div class="eyebrow">Мюнхен · 25 октября · 10 остановок</div>
+    <h1>${esc(HERO_NAME)}, <em>добро пожаловать</em> в Мюнхен</h1>
+    <p class="lead">В 1158 году герцог Генрих Лев построил здесь мост, и город получил имя «у монахов». Твоя миссия: пройти центр, узнать, что за этим стоит, собрать 10 печатей города и сложить из букв слово, которым баварцы и здороваются, и прощаются.</p>
+  </div>
+  <section class="card">
+    <h2>План дня, 25 октября</h2>
+    <ul class="timeline">
+      <li><b>09:40</b><span>Прилёт, Terminal 2. S1 или S8 до Hauptbahnhof, пять минут пешком до KING's Hotel First Class (Dachauer Str. 13). Вещи оставляем: заселение после 15:00.</span></li>
+      <li><b>11:00–11:30</b><span>Выходим в центр: Карлстор, Михаэлькирхе, Фрауэнкирхе по пути.</span></li>
+      <li><b>12:00</b><span>Обед в Café Glockenspiel на Marienplatz. Куранты играют в 12:00.</span></li>
+      <li><b>13:30–17:00</b><span>Старый Пётр, Виктуалиенмаркт, Резиденция, Одеонсплац, Hofgarten и Eisbach. Заход солнца около 17:00.</span></li>
+      <li><b>17:30–18:00</b><span>Ужин в Hofbräuhaus. Потом в отель пешком или на транспорте.</span></li>
+    </ul>
+    <p class="sub">Воскресенье: магазины закрыты, лотки Виктуалиенмаркта обычно тоже. Часы работы церквей, башни и музеев проверь на месте.</p>
+  </section>
+  <section class="card">
+    <h2>Как играть</h2>
+    <ol class="steps"><li>Приходи на точку. Подсказка и карта ведут к ней.</li><li>Нажми «Я на месте». Откроются история и задания.</li><li>Отвечай, фотографируй, снимай. За выполнение даётся печать с буквой.</li></ol>
+    <p class="sub">Прогресс и фото хранятся в этом браузере. Видео остаются в галерее телефона, здесь только отметка и предпросмотр. Весь маршрут около 7 км с Английским садом, на него уходит весь день до вечера.</p>
+  </section>
+  <section class="card">
+    <div class="eyebrow">Тайное слово · ${done} из 10 печатей</div>
+    <div class="word" role="img" aria-label="Тайное слово">${slots}</div>
+    <p class="sub">Каждая печать открывает одну букву. Слово состоит из двух частей: приветствие и имя.</p>
+  </section>
+  <h2 class="h2s">Маршрут</h2>
+  <div class="card" style="padding:10px"><div class="mapwrap">${mapSVG()}</div></div>
+  <div class="list">${STOPS.map(rowHTML).join('')}</div>
+  <h2 class="h2s">Бонус</h2>
+  <p class="sub">Если останутся силы. Очки без букв.</p>
+  <div class="list">${BONUS.map(rowHTML).join('')}</div>
+  <div class="btns" style="margin-top:22px">
+    <button class="btn ghost" data-act="album">Альбом</button>
+    <button class="btn gold" data-act="final" ${done<10?'disabled':''}>${done<10?'Грамота откроется после 10 печатей':'Открыть грамоту'}</button>
+  </div>
+  <p class="sub" style="margin-top:14px">Очки: ${pts} из ${maxPoints()}.</p>`;
+}
+
+function taskHTML(s,t){
+  const p=P(s.id),r=p.t[t.id]||{},ok=!!r.ok,key=s.id+'.'+t.id;
+  let body='';
+  if(t.type==='quiz'){
+    body=`<p class="q">${esc(t.q)}</p><div class="opts">${t.opts.map((o,i)=>{
+      const bad=(r.wrong||[]).includes(i),good=ok&&i===t.a;
+      return `<button class="opt ${bad?'bad':''} ${good?'good':''}" data-act="quiz" data-s="${s.id}" data-t="${t.id}" data-i="${i}" ${ok||bad?'disabled':''}>${esc(o)}</button>`;}).join('')}</div>
+      ${ok?`<p class="why">${esc(t.why)}</p>`:(r.wrong&&r.wrong.length?`<p class="msg">Почти. Попробуй другой вариант.</p>`:'')}`;
+  }else if(t.type==='text'){
+    body=`<p class="q">${esc(t.q)}</p>`+(ok?`<p class="why"><b>${esc(r.val||'')}</b> · ${esc(t.why)}</p>`:`
+      <div class="field"><input type="text" id="in-${key}" data-enter="${key}" autocomplete="off" placeholder="Твой ответ" value="${esc(r.tried||'')}"><button class="btn" data-act="text" data-s="${s.id}" data-t="${t.id}">Проверить</button></div>
+      ${r.miss?`<p class="msg">Пока не то. Проверь ещё раз.</p>`:''}
+      ${hints[key]?`<p class="hint">Подсказка: ${esc(t.hint)}</p>`:`<button class="linkbtn" data-act="hint" data-s="${s.id}" data-t="${t.id}">Нужна подсказка</button>`}`);
+  }else if(t.type==='check'){
+    body=`<p class="q">${esc(t.q)}</p>`+(ok?`<p class="why">Отмечено. Молодец.</p>`:`<button class="btn" data-act="check" data-s="${s.id}" data-t="${t.id}">Да, нашла!</button>`);
+  }else{
+    const isV=t.type==='video',url=vids[key];
+    body=`<p class="q">${esc(t.q)}</p>
+      ${!isV&&r.img?`<img class="shot" src="${r.img}" alt="Твоё фото">`:''}
+      ${isV&&url?`<video class="shot" src="${url}" controls playsinline></video>`:''}
+      ${ok?`<p class="why">${isV?'Видео снято, оно осталось в твоей галерее.':'Фото добавлено в альбом.'}</p>`:''}
+      <label class="btn ${ok?'ghost':''} up" tabindex="-1">${ok?(isV?'Снять другое':'Заменить фото'):(isV?'Снять или выбрать видео':'Сделать или выбрать фото')}<input type="file" accept="${isV?'video/*':'image/*'}" data-up="${t.type}" data-s="${s.id}" data-t="${t.id}"></label>`;
+  }
+  return `<div class="task ${ok?'ok':''}"><div class="kind"><span>${KINDS[t.type]}${t.type==='video'?' · бонус':''}</span><span>${ok?'✓ +'+(r.pts||0):'+'+PTS[t.type]}</span></div>${body}</div>`;
+}
+
+function stopView(s){
+  const p=P(s.id),d=complete(s);
+  const mapUrl=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.mapQ)}`;
+  const yt=`https://www.youtube.com/results?search_query=${encodeURIComponent(s.links.yt)}`;
+  const wk=`https://ru.wikipedia.org/w/index.php?search=${encodeURIComponent(s.links.wiki)}`;
+  let h=`<button class="back" data-act="home">← К маршруту</button>
+  <header class="stop-head"><div class="eyebrow">${s.bonus?'Бонус':'Остановка '+s.n+' из 10'}</div><h1>${esc(s.name)}</h1><div class="de">${esc(s.de)}</div>
+  <div class="chips"><span class="chip">≈ ${s.min} мин</span><span class="chip">${esc(s.best)}</span></div></header>
+  <section class="card"><h3>Где искать</h3><p>${esc(s.riddle)}</p><p class="sub">${esc(s.way)}</p>
+  <div class="btns"><a class="btn ghost" href="${mapUrl}" target="_blank" rel="noopener">Открыть на карте</a>
+  <button class="btn ${p.arrived?'ghost':''}" data-act="arrive" data-s="${s.id}" ${p.arrived?'disabled':''}>${p.arrived?'✓ Я на месте':'Я на месте!'}</button></div></section>`;
+  if(!p.arrived){
+    return h+`<section class="card lock"><p>История и задания откроются, когда ты будешь на точке.</p></section>`;
+  }
+  h+=`<section class="card"><h3>История</h3>${audioHTML(s)}<div class="story">${s.story.map(x=>`<p>${esc(x)}</p>`).join('')}</div>
+  <ul class="timeline">${s.timeline.map(([y,t])=>`<li><b>${esc(y)}</b><span>${esc(t)}</span></li>`).join('')}</ul>
+  <div class="fact"><b>Ещё факт</b><br>${esc(s.fact)}</div>
+  <div class="btns"><a class="btn ghost" href="${yt}" target="_blank" rel="noopener">Видео об этом месте</a><a class="btn ghost" href="${wk}" target="_blank" rel="noopener">Почитать подробнее</a></div></section>
+  <h2 class="h2s" style="margin-top:22px">Задания</h2><div class="list" style="gap:12px">${s.tasks.map(t=>taskHTML(s,t)).join('')}</div>`;
+  if(s.bonus){
+    h+=`<section class="card reward"><div class="eyebrow">Бонус</div><p>${d?'Бонус выполнен. +'+STAMP_PTS+' очков.':'Ответь на вопрос и сделай фото, чтобы получить бонусные очки.'}</p></section>`;
+  }else{
+    h+=`<section class="card reward">${stamp(s.n,s.letter,d,120,pop[s.id])}<h3>${d?`Печать получена: «${s.letter}»`:'Печать ждёт'}</h3>
+    <p class="letter-note">${d?`Букву ${s.letter} впиши в тайное слово.`:'Выполни вопрос, ответ и фото, и печать появится. Видео это бонус.'}</p>
+    ${d?`<button class="btn" data-act="${s.n<10?'next':'home'}" data-s="${s.id}">${s.n<10?'К следующей точке →':'К итогам'}</button>`:''}</section>`;
+  }
+  return h;
+}
+
+function album(){
+  const items=[];
+  for(const s of ALL){const p=P(s.id);for(const t of s.tasks){const r=p.t[t.id];if(t.type==='photo'&&r&&r.img)items.push([s,r.img]);}}
+  return `<button class="back" data-act="home">← К маршруту</button><div class="hero" style="padding-top:4px"><h1 style="font-size:40px">Альбом</h1></div>
+  ${items.length?`<div class="album" style="margin-top:14px">${items.map(([s,im])=>`<figure><img src="${im}" alt="${esc(s.name)}"><figcaption>${esc(s.name)}</figcaption></figure>`).join('')}</div>`
+  :`<section class="card lock"><p>Пока пусто. Фото из заданий появятся здесь.</p></section>`}`;
+}
+
+function rank(n){const r=n/maxPoints();return r>=.9?'Почётная жительница Мюнхена':r>=.6?'Знаток старого города':r>=.3?'Исследовательница':'Гостья города';}
+function finalView(){
+  const pts=points();
+  if(!st.final){
+    return `<button class="back" data-act="home">← К маршруту</button>
+    <section class="card"><div class="eyebrow">Последнее задание</div><h2>Прочитай слово</h2>
+    <div class="word">${WORD.map((l,i)=>(i===6?'<span class="gap"></span>':'')+`<span class="slot on">${l}</span>`).join('')}</div>
+    <p class="q">Как баварцы здороваются и прощаются? Введи первое слово.</p>
+    <div class="field"><input type="text" id="in-final" data-enter="final" autocomplete="off" placeholder="Слово"><button class="btn gold" data-act="word">Проверить</button></div>
+    <p class="sub">Когда слово сложится, тебя ждёт подарок. Подсказка: он красно-белый, и в Мюнхене его носят на стадионе.</p>
+    <p class="msg" id="finalmsg" hidden>Близко, но нет. Посмотри на первые шесть букв.</p></section>`;
+  }
+  const d=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  return `<button class="back" data-act="home">← К маршруту</button><div class="cert"><div class="rauten" style="width:100%"></div>
+    <div class="eyebrow">Грамота · München</div><h1>${esc(HERO_NAME)}, Servus!</h1>
+    <p>${esc(rank(pts))}. Пройден исторический центр Мюнхена: 10 печатей, ${pts} очков из ${maxPoints()}.</p>
+    <div class="stamps">${STOPS.map(s=>stamp(s.n,s.letter,true,60,false)).join('')}</div>
+    <div class="fact" style="text-align:left"><b>Награда</b><br>Тебя ждёт подарок: ${esc(GIFT)}. Красно-белая, стадион Allianz Arena, а теперь ещё и твой Мюнхен.</div>
+    <p class="note">${esc(FINAL_NOTE)}</p><p class="sub">${d}</p></div>
+    <div class="btns" style="margin-top:16px"><button class="btn ghost" data-act="album">Альбом</button></div>`;
+}
+
+function render(){
+  const y=window.scrollY;
+  let inner='';
+  if(view.name==='home')inner=home();
+  else if(view.name==='stop')inner=stopView(ALL.find(s=>s.id===view.id));
+  else if(view.name==='album')inner=album();
+  else inner=finalView();
+  document.getElementById('app').innerHTML=`<div class="bar"><b>Мюнхен для ${esc(HERO_GEN)}</b><div class="score"><span>печати <b>${stampsDone()}/10</b></span><span>очки <b>${points()}</b></span></div></div>${inner}`;
+  window.scrollTo(0,view._keep?y:0);view._keep=false;
+}
+function go(name,id){stopSpeech();view={name,id};render();}
+function keep(){view._keep=true;}
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ============ ГОЛОС ============ */
+const AUDIO_BAKED = {};
+let AUDIO = Object.assign({}, AUDIO_BAKED), canEdit = false, assetsApi = null, dbApi = null, audMsg = {};
+function audioHTML(s){
+  const id = AUDIO[s.id];
+  let h = '';
+  if(id){
+    h += `<div class="audio"><div class="eyebrow">Рассказ голосом</div><audio controls preload="none" src="${id.includes('/')?esc(id):'/_blob/'+esc(id)}"></audio></div>`;
+  }else if('speechSynthesis' in window){
+    h += `<div class="btns"><button class="btn ${speaking===s.id?'gold':'ghost'}" data-act="listen" data-s="${s.id}">${speaking===s.id?'■ Остановить':'▶ Слушать рассказ'}</button></div>`;
+  }
+  if(canEdit && assetsApi){
+    h += `<div class="rec"><div class="eyebrow">Режим записи (видишь только ты)</div>
+    <p class="sub">Запиши рассказ в «Диктофоне» или «Голосовых заметках» и выбери файл. Подойдут m4a, mp4 и webm.</p>
+    <label class="btn ghost up" tabindex="-1">${id?'Заменить запись':'Выбрать аудиофайл'}<input type="file" accept="audio/*,video/mp4,video/webm,.m4a,.mp4,.webm" data-aud="${s.id}"></label>
+    ${audMsg[s.id]?`<p class="${audMsg[s.id].err?'msg':'sub'}">${esc(audMsg[s.id].t)}</p>`:''}</div>`;
+  }
+  return h;
+}
+async function uploadAudio(input){
+  const f = input.files && input.files[0]; if(!f) return;
+  const sid = input.dataset.aud, name = (f.name||'').toLowerCase(), t = (f.type||'').toLowerCase();
+  const isWebm = /webm/.test(t) || name.endsWith('.webm');
+  const isMp4 = /(mp4|m4a|mpeg4|aac)/.test(t) || /\.(m4a|mp4)$/.test(name);
+  if(!isWebm && !isMp4){audMsg[sid]={err:1,t:'Этот формат не подойдёт. Запиши в «Диктофоне» (формат m4a) и выбери файл снова.'};keep();render();return;}
+  audMsg[sid]={t:'Загружаю…'};keep();render();
+  try{
+    const r = await assetsApi.upload(f,{type:isWebm?'video/webm':'video/mp4'});
+    const old = AUDIO[sid];
+    await dbApi.doc('audio/'+sid).set({assetId:r.id});
+    AUDIO[sid] = r.id;
+    if(old && old!==r.id){try{await assetsApi.delete(old);}catch(e){}}
+    audMsg[sid]={t:'Готово. Запись сохранена.'};
+  }catch(e){
+    audMsg[sid]={err:1,t:'Не получилось сохранить ('+((e&&e.code)||'ошибка')+'). Файл можно прислать Claude в чат.'};
+  }
+  keep();render();
+}
+async function initCaps(){
+  if(!(window.claude&&window.claude.use)) return;
+  try{const u=await claude.use('user'); canEdit = u ? !!(await u.canEdit()) : false;}catch(e){}
+  try{assetsApi = await claude.use('assets');}catch(e){}
+  try{
+    dbApi = await claude.use('db');
+    if(dbApi) dbApi.collection('audio').onSnapshot(snap=>{
+      const m = Object.assign({}, AUDIO_BAKED);
+      snap.docs.forEach(d=>{const v=d.data(); if(v&&v.assetId) m[d.id]=v.assetId;});
+      AUDIO = m; if(view.name==='stop'){keep();render();}
+    },()=>{});
+  }catch(e){}
+  if(view.name==='stop'){keep();render();}
+}
+let speaking=null;
+function stopSpeech(){try{window.speechSynthesis&&speechSynthesis.cancel();}catch(e){}speaking=null;}
+function listen(id){
+  if(speaking===id){stopSpeech();keep();render();return;}
+  stopSpeech();
+  const s=stopOf(id),parts=[s.name+'.',...s.story,'Ещё факт. '+s.fact];
+  const voices=speechSynthesis.getVoices(),v=voices.find(x=>/^ru/i.test(x.lang));
+  speaking=id;
+  parts.forEach((t,i)=>{
+    const u=new SpeechSynthesisUtterance(t);u.lang='ru-RU';u.rate=.95;if(v)u.voice=v;
+    if(i===parts.length-1)u.onend=u.onerror=()=>{if(speaking===id){speaking=null;if(view.name==='stop'&&view.id===id){keep();render();}}};
+    speechSynthesis.speak(u);
+  });
+  keep();render();
+}
+
+/* ============ ДЕЙСТВИЯ ============ */
+function stopOf(id){return ALL.find(s=>s.id===id);}
+function taskOf(s,id){return s.tasks.find(t=>t.id===id);}
+function award(s,before){
+  if(!before&&complete(s)){pop[s.id]=true;toast(s.bonus?'Бонус получен! +'+STAMP_PTS:'Печать получена! Буква «'+s.letter+'»');}
+}
+function doTask(act,el){
+  const s=stopOf(el.dataset.s),t=taskOf(s,el.dataset.t),p=P(s.id),before=complete(s);
+  const key=s.id+'.'+t.id,r=p.t[t.id]||(p.t[t.id]={});
+  if(act==='quiz'){
+    const i=+el.dataset.i;
+    if(i===t.a){r.ok=true;r.pts=(r.wrong&&r.wrong.length)?Math.round(PTS.quiz/2):PTS.quiz;}
+    else{(r.wrong=r.wrong||[]).push(i);}
+  }else if(act==='text'){
+    const inp=document.getElementById('in-'+key),v=(inp.value||'').trim();
+    const norm=v.toLowerCase().replace(/ё/g,'е');
+    if(t.re.test(norm)&&norm){r.ok=true;r.val=v;r.pts=r.miss?Math.round(PTS.text*.7):PTS.text;}
+    else{r.miss=true;r.tried=v;}
+  }else if(act==='check'){r.ok=true;r.pts=PTS.check;}
+  save();award(s,before);keep();render();
+}
+function doUpload(input){
+  const f=input.files&&input.files[0];if(!f)return;
+  const s=stopOf(input.dataset.s),t=taskOf(s,input.dataset.t),before=complete(s);
+  const key=s.id+'.'+t.id,p=P(s.id),r=p.t[t.id]||(p.t[t.id]={});
+  if(input.dataset.up==='video'){
+    if(vids[key])URL.revokeObjectURL(vids[key]);
+    vids[key]=URL.createObjectURL(f);r.ok=true;r.pts=PTS.video;save();award(s,before);keep();render();return;
+  }
+  const img=new Image(),url=URL.createObjectURL(f);
+  img.onload=()=>{
+    const m=640,k=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement('canvas');
+    c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    r.img=c.toDataURL('image/jpeg',.72);URL.revokeObjectURL(url);
+    r.ok=true;r.pts=PTS.photo;save();award(s,before);keep();render();
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);toast('Не удалось открыть фото. Попробуй другое.');};
+  img.src=url;
+}
+
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
+  const a=el.dataset.act;
+  if(a==='open')go('stop',el.dataset.id);
+  else if(a==='home')go('home');
+  else if(a==='listen')listen(el.dataset.s);
+  else if(a==='album')go('album');
+  else if(a==='final')go('final');
+  else if(a==='arrive'){P(el.dataset.s).arrived=true;save();keep();render();toast('Отлично! Читай историю и выполняй задания.');}
+  else if(a==='next'){const i=STOPS.findIndex(s=>s.id===el.dataset.s);go('stop',STOPS[i+1].id);}
+  else if(a==='hint'){hints[el.dataset.s+'.'+el.dataset.t]=true;keep();render();}
+  else if(a==='word'){const v=(document.getElementById('in-final').value||'').toLowerCase().replace(/ё/g,'е').trim();
+    if(/^(servus|сервус)$/.test(v)){st.final=true;save();render();}else document.getElementById('finalmsg').hidden=false;}
+  else doTask(a,el);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.enter){
+    const k=e.target.dataset.enter;
+    const b=k==='final'?document.querySelector('[data-act="word"]'):document.querySelector(`[data-act="text"][data-s="${k.split('.')[0]}"][data-t="${k.split('.')[1]}"]`);
+    if(b)b.click();
+  }else if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('g.dot')){e.preventDefault();go('stop',e.target.dataset.id);}
+});
+document.addEventListener('change',e=>{if(e.target.matches&&e.target.matches('input[data-up]'))doUpload(e.target);else if(e.target.matches&&e.target.matches('input[data-aud]'))uploadAudio(e.target);});
+
+render();
+initCaps();
+</script>
+
+</body></html>
