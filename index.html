@@ -558,7 +558,7 @@ function keep(){view._keep=true;}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ============ ГОЛОС ============ */
-const AUDIO_BAKED = {};
+const AUDIO_BAKED = {s1:'audio/01.m4a',s2:'audio/02.m4a',s3:'audio/03.m4a',s4:'audio/04.m4a',s5:'audio/05.m4a'};
 let AUDIO = Object.assign({}, AUDIO_BAKED), canEdit = false, assetsApi = null, dbApi = null, audMsg = {};
 function audioHTML(s){
   const id = AUDIO[s.id];
