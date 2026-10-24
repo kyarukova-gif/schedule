@@ -558,7 +558,7 @@ function keep(){view._keep=true;}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2600);}
 
 /* ============ ГОЛОС ============ */
-const AUDIO_BAKED = {s1:'audio/01.m4a',s2:'audio/02.m4a',s3:'audio/03.m4a',s4:'audio/04.m4a',s5:'audio/05.m4a'};
+const AUDIO_BAKED = {s1:'audio/01.mp4',s2:'audio/02.mp4',s3:'audio/03.mp4',s4:'audio/04.mp4',s5:'audio/05.mp4',s6:'audio/06.mp4',s7:'audio/07.mp4',s8:'audio/08.mp4',s9:'audio/09.mp4',s10:'audio/10.mp4'};
 let AUDIO = Object.assign({}, AUDIO_BAKED), canEdit = false, assetsApi = null, dbApi = null, audMsg = {};
 function audioHTML(s){
   const id = AUDIO[s.id];
