@@ -1,0 +1,12 @@
+name = "photo-booking"
+main = "index.js"
+compatibility_date = "2026-01-01"
+
+[vars]
+# Адрес, где лежит страница записи (без слэша на конце)
+SITE_URL = "https://REPLACE_ME.github.io/schedule/booking"
+ALLOWED_ORIGIN = "https://REPLACE_ME.github.io"
+
+[[kv_namespaces]]
+binding = "SLOTS"
+id = "REPLACE_WITH_KV_ID"   # npx wrangler kv namespace create SLOTS

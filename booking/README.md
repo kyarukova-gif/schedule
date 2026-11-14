@@ -1,15 +1,30 @@
-# Запись на фотосессию
+# Запись на фотосессию (автоблокировка слотов)
 
-Открывается по ссылке, сделана под телефон (RU / EN / DE). Выбор дня → время → имя и email → оплата предоплаты 20 € через Stripe.
+Страница для телефона (RU / EN / DE): день → время → имя, Instagram, телефон → оплата 20 € в Stripe.
+Слот держится 30 минут, пока человек платит, и закрывается сам после оплаты. Если не оплатил, слот освобождается.
+Instagram и телефон клиента видны в платеже в Stripe (Metadata).
 
-## Запуск за 10 минут
-1. **Stripe**: Payment links → Create → товар «Предоплата за фотосессию», 20 €, разово.
-   - Customer information → добавь текстовое поле «Instagram / Telegram / WhatsApp».
-   - After payment → сообщение «Спасибо! Слот забронирован, я напишу тебе в течение дня».
-   - Скопируй ссылку `https://buy.stripe.com/...`.
-2. **config.js**: вставь ссылку в `stripeLink`, поставь свои даты, часы, место и свой Instagram.
-3. **Хостинг**: GitHub → Settings → Pages → ветка main, папка `/`. Адрес будет `.../booking/`.
-4. **Instagram**: вставь адрес в «Ссылку в профиле» и в кнопку «Записаться». В сторис используй стикер «Ссылка».
+## Файлы
+- `index.html` — страница записи.
+- `config.js` — только адрес сервера (`apiUrl`).
+- `worker/config.js` — **даты, часы, цены, Instagram** (меняешь тут).
+- `worker/index.js` — сервер (Cloudflare Worker, бесплатный тариф).
+- `worker/test.mjs` — проверка логики: `node worker/test.mjs`.
 
-## Как закрывать занятые слоты
-В Stripe в каждом платеже видно `client_reference_id`, например `2026-12-12_1430_anna`. Добавь `"2026-12-12 14:30"` в `taken` в `config.js` и закоммить, слот станет серым. Приложение само слоты не блокирует, это шаг на ручной режим.
+## Запуск
+1. **Cloudflare**: бесплатный аккаунт на cloudflare.com. В папке `worker/`:
+   ```
+   npx wrangler login
+   npx wrangler kv namespace create SLOTS      # вставь id в wrangler.toml
+   npx wrangler secret put STRIPE_SECRET_KEY    # sk_live_... из Stripe → Developers → API keys
+   npx wrangler deploy                          # напечатает адрес https://photo-booking.<имя>.workers.dev
+   ```
+2. **Stripe webhook**: Developers → Webhooks → Add endpoint.
+   - URL: `https://photo-booking.<имя>.workers.dev/api/webhook`
+   - События: `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`.
+   - Скопируй Signing secret `whsec_...` и выполни `npx wrangler secret put STRIPE_WEBHOOK_SECRET`.
+3. **Адреса**: в `wrangler.toml` пропиши `SITE_URL` и `ALLOWED_ORIGIN` (где лежит страница), в `booking/config.js` пропиши `apiUrl`. Затем снова `npx wrangler deploy`.
+4. **Страница**: GitHub Pages (ветка main, корень). Эту ссылку вставь в Instagram.
+5. Проверь одним тестовым платежом: сначала с ключами `sk_test_` и картой `4242 4242 4242 4242`, потом переключи на боевые.
+
+Слоты хранятся в Cloudflare KV. Брони (имя, Instagram, телефон) лежат там же и в Stripe.

@@ -111,7 +111,8 @@
   <section>
     <h2><span class="n">3</span><span data-i="stepYou"></span></h2>
     <label class="field"><span data-i="name"></span><input id="name" autocomplete="name"></label>
-    <label class="field"><span data-i="email"></span><input id="email" type="email" inputmode="email" autocomplete="email"></label>
+    <label class="field"><span data-i="insta"></span><input id="insta" autocapitalize="none" autocorrect="off" placeholder="@username"></label>
+    <label class="field"><span data-i="phone"></span><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+49 170 1234567"></label>
   </section>
 
   <section>
@@ -138,13 +139,14 @@
 <script src="config.js"></script>
 <script>
 (function(){
-  const C = window.BOOKING;
+  const API = (window.BOOKING.apiUrl||"").replace(/\/$/,"");
+  let C = {days:[],taken:[],priceTotal:0,deposit:0,slotMinutes:30,instagram:""};
 
   // ---------- переводы ----------
   const T = {
     ru:{title:"Рождественская фотосессия",sub:"Полчаса на рождественском рынке — и тёплые кадры на память",
       pillDeposit:"предоплата {dep} €",stepDay:"Выбери день",stepTime:"Выбери время",stepYou:"Твои данные",
-      stepPay:"Проверь и оплати предоплату",name:"Имя",email:"Email (для чека Stripe)",
+      stepPay:"Проверь и оплати предоплату",name:"Имя",insta:"Твой Instagram",phone:"Телефон для связи",errInsta:"Проверь Instagram (например @anna)",errPhone:"Проверь номер телефона",taken:"Это время только что заняли — выбери другое",errNet:"Не получилось, попробуй ещё раз",loading:"Загружаю расписание…",paidTitle:"Ты записана! 🎄",paidText:"Предоплата получена. Я напишу тебе в Instagram или на телефон, чтобы подтвердить детали.",paidClose:"Закрыть",
       when:"Когда",shoot:"Съёмка {min} мин",onsite:"Остаток на месте",payNow:"Платишь сейчас",
       agree:"Понимаю, что предоплата {dep} € невозвратная. Остаток {rest} € оплачиваю на съёмке.",
       weather:"Съёмка проходит на улице. Если погода сложная — перенесём на другой фотодень, предоплата сохранится.",
@@ -152,12 +154,12 @@
       pick:"Выбери день и время",btn:"Оплатить {dep} € и забронировать",btnPick:"Выбери день и время",
       pickDay:"Сначала выбери день",left:"свободно {n}",full:"занято",
       need:"Заполни поля",needAgree:"Подтверди условия предоплаты",needTime:"Выбери время",
-      stub:"Ссылка Stripe ещё не вставлена в config.js",min:"мин",
+      min:"мин",
       wd:["вс","пн","вт","ср","чт","пт","сб"],mo:["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"],
       moFull:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]},
     en:{title:"Christmas Photoshoot",sub:"30 minutes at the Christmas market — warm photos to keep",
       pillDeposit:"{dep} € deposit",stepDay:"Pick a day",stepTime:"Pick a time",stepYou:"Your details",
-      stepPay:"Review & pay the deposit",name:"Name",email:"Email (for Stripe receipt)",
+      stepPay:"Review & pay the deposit",name:"Name",insta:"Your Instagram",phone:"Phone number",errInsta:"Check your Instagram (e.g. @anna)",errPhone:"Check your phone number",taken:"That time was just taken — pick another",errNet:"Something went wrong, please try again",loading:"Loading schedule…",paidTitle:"You're booked! 🎄",paidText:"Deposit received. I'll message you on Instagram or by phone to confirm the details.",paidClose:"Close",
       when:"When",shoot:"{min}-min session",onsite:"Balance on site",payNow:"Pay now",
       agree:"I understand the {dep} € deposit is non-refundable. I'll pay the {rest} € balance at the shoot.",
       weather:"The shoot is outdoors. If the weather is bad, we'll move you to another photo day — your deposit carries over.",
@@ -165,12 +167,12 @@
       pick:"Pick a day and time",btn:"Pay {dep} € & book",btnPick:"Pick a day and time",
       pickDay:"Pick a day first",left:"{n} left",full:"full",
       need:"Please fill in the fields",needAgree:"Please accept the deposit terms",needTime:"Pick a time",
-      stub:"Stripe link isn't set in config.js yet",min:"min",
+      min:"min",
       wd:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mo:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
       moFull:["January","February","March","April","May","June","July","August","September","October","November","December"]},
     de:{title:"Weihnachts-Fotoshooting",sub:"30 Minuten auf dem Weihnachtsmarkt — warme Bilder zur Erinnerung",
       pillDeposit:"{dep} € Anzahlung",stepDay:"Tag wählen",stepTime:"Uhrzeit wählen",stepYou:"Deine Daten",
-      stepPay:"Prüfen & Anzahlung zahlen",name:"Name",email:"E-Mail (für den Stripe-Beleg)",
+      stepPay:"Prüfen & Anzahlung zahlen",name:"Name",insta:"Dein Instagram",phone:"Telefonnummer",errInsta:"Instagram prüfen (z. B. @anna)",errPhone:"Telefonnummer prüfen",taken:"Diese Zeit wurde gerade vergeben — bitte andere wählen",errNet:"Etwas ist schiefgelaufen, bitte erneut versuchen",loading:"Lade Termine…",paidTitle:"Du bist gebucht! 🎄",paidText:"Anzahlung erhalten. Ich melde mich per Instagram oder Telefon, um die Details zu bestätigen.",paidClose:"Schließen",
       when:"Wann",shoot:"Shooting {min} Min.",onsite:"Rest vor Ort",payNow:"Jetzt zahlen",
       agree:"Mir ist klar, dass die Anzahlung von {dep} € nicht erstattet wird. Den Rest ({rest} €) zahle ich vor Ort.",
       weather:"Das Shooting findet draußen statt. Bei schlechtem Wetter verschieben wir auf einen anderen Fototag — die Anzahlung bleibt gültig.",
@@ -178,11 +180,11 @@
       pick:"Tag und Uhrzeit wählen",btn:"{dep} € zahlen & buchen",btnPick:"Tag und Uhrzeit wählen",
       pickDay:"Bitte zuerst einen Tag wählen",left:"{n} frei",full:"voll",
       need:"Bitte Felder ausfüllen",needAgree:"Bitte Anzahlungsbedingungen bestätigen",needTime:"Uhrzeit wählen",
-      stub:"Stripe-Link fehlt noch in config.js",min:"Min.",
+      min:"Min.",
       wd:["So","Mo","Di","Mi","Do","Fr","Sa"],mo:["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],
       moFull:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]}
   };
-  const rest = C.priceTotal - C.deposit;
+  let rest = 0;
   let lang = "ru";
   try{ lang = localStorage.getItem("lang") || ((navigator.language||"ru").slice(0,2)); }catch(e){}
   if(!T[lang]) lang = "ru";
@@ -195,14 +197,13 @@
   const pad = n => String(n).padStart(2,"0");
   const toMin = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
   const fromMin = n => pad(Math.floor(n/60))+":"+pad(n%60);
-  const taken = new Set(C.taken);
   function slotsFor(day){
     const out=[]; for(let m=toMin(day.start); m+C.slotMinutes<=toMin(day.end); m+=C.slotMinutes){
-      const time=fromMin(m); out.push({time, taken: taken.has(day.date+" "+time)});
+      const time=fromMin(m); out.push({time, taken: C.taken.includes(day.date+" "+time)});
     } return out;
   }
   const dObj = ds => { const [y,m,d]=ds.split("-").map(Number); return new Date(y,m-1,d); };
-  const todayStr = () => { const n=new Date(); return n.getFullYear()+"-"+pad(n.getMonth()+1)+"-"+pad(n.getDate()); };
+  const todayStr = () => (C.now||"").slice(0,10);
 
   let selDay = null, selTime = null;
 
@@ -256,30 +257,61 @@
   function toast(msg){ const el=$("toast"); el.textContent=msg; el.style.display="block"; clearTimeout(toast.t); toast.t=setTimeout(()=>el.style.display="none",3200); }
   const slug = s => s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,30) || "guest";
 
-  $("go").onclick = () => {
-    ["name","email"].forEach(id=>$(id).classList.remove("bad"));
+  $("go").onclick = async () => {
+    ["name","insta","phone"].forEach(id=>$(id).classList.remove("bad"));
     $("agreeBox").classList.remove("bad");
     if(!selDay || !selTime){ toast(t("needTime")); $("slots").scrollIntoView({behavior:"smooth",block:"center"}); return; }
-    const name=$("name").value.trim(), email=$("email").value.trim();
-    let bad=false;
-    if(!name){ $("name").classList.add("bad"); bad=true; }
-    if(!/^\S+@\S+\.\S+$/.test(email)){ $("email").classList.add("bad"); bad=true; }
-    if(bad){ toast(t("need")); ($("name").classList.contains("bad")?$("name"):$("email")).focus(); return; }
+    const name=$("name").value.trim(), insta=$("insta").value.trim(), phone=$("phone").value.trim();
+    const instaOk = /^@?[A-Za-z0-9._]{1,30}$/.test(insta.replace(/^https?:\/\/(www\.)?instagram\.com\//i,"").replace(/[/?#].*$/,""));
+    const phoneOk = /^[+\d][\d\s().-]{5,24}$/.test(phone) && phone.replace(/\D/g,"").length>=7;
+    const bad = [!name&&"name", !instaOk&&"insta", !phoneOk&&"phone"].filter(Boolean);
+    if(bad.length){
+      bad.forEach(id=>$(id).classList.add("bad"));
+      toast(bad[0]==="insta"?t("errInsta"):bad[0]==="phone"?t("errPhone"):t("need"));
+      $(bad[0]).focus(); return;
+    }
     if(!$("agree").checked){ $("agreeBox").classList.add("bad"); toast(t("needAgree")); $("agreeBox").scrollIntoView({behavior:"smooth",block:"center"}); return; }
-    if(C.stripeLink.includes("REPLACE_ME")){ toast(t("stub")); return; }
 
-    // слот и имя уходят в Stripe как client_reference_id — видно в платеже
-    const ref = `${selDay}_${selTime.replace(":","")}_${slug(name)}`;
-    const url = new URL(C.stripeLink);
-    url.searchParams.set("client_reference_id", ref);
-    url.searchParams.set("prefilled_email", email);
-    url.searchParams.set("locale", lang);
-    try{ localStorage.setItem("lastBooking", JSON.stringify({ref,name})) }catch(e){}
     $("go").disabled = true;
-    location.href = url.toString();
+    try{
+      const r = await fetch(API+"/api/checkout",{method:"POST",headers:{"content-type":"application/json"},
+        body:JSON.stringify({date:selDay,time:selTime,name,instagram:insta,phone,lang})});
+      const j = await r.json().catch(()=>({}));
+      if(r.ok && j.url){ location.href = j.url; return; }
+      if(r.status===409){ toast(t("taken")); selTime=null; await load(); return; }
+      if(j.error==="bad_instagram"){ $("insta").classList.add("bad"); toast(t("errInsta")); }
+      else if(j.error==="bad_phone"){ $("phone").classList.add("bad"); toast(t("errPhone")); }
+      else toast(t("errNet"));
+    }catch(e){ toast(t("errNet")); }
+    $("go").disabled = false;
   };
 
-  renderAll();
+  async function load(){
+    try{
+      const r = await fetch(API+"/api/config",{cache:"no-store"});
+      C = await r.json(); rest = C.priceTotal - C.deposit;
+      if(selDay && !C.days.find(d=>d.date===selDay)) selDay=null;
+    }catch(e){ toast(t("errNet")); }
+    renderAll();
+  }
+  // свежие данные при возвращении на вкладку (чтобы не выбрать чужой слот)
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden) load(); });
+
+  // экран после успешной оплаты
+  const q = new URLSearchParams(location.search);
+  if(q.get("paid")==="1"){
+    const ov=document.createElement("div");
+    ov.style.cssText="position:fixed;inset:0;z-index:20;background:var(--bg);display:grid;place-items:center;padding:24px;text-align:center";
+    const slot=q.get("slot")||"";
+    ov.innerHTML=`<div><div style="font-size:56px">🎄</div><h1 style="font:600 28px Georgia,serif;margin:10px 0" id="pt"></h1>
+      <p style="font-weight:600;margin:0 0 8px">${slot.replace(/[<>&"]/g,"")}</p><p style="color:var(--mute);max-width:340px;margin:0 auto 20px" id="pp"></p>
+      <button class="btn" style="position:static" id="pc"></button></div>`;
+    document.body.appendChild(ov);
+    const fill=()=>{ $("pt").textContent=t("paidTitle").replace("🎄","").trim(); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose"); };
+    fill(); $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
+  }
+
+  renderStatic(); renderLang(); load();
 })();
 </script>
 </body>
