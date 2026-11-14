@@ -198,7 +198,7 @@
   const toMin = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
   const fromMin = n => pad(Math.floor(n/60))+":"+pad(n%60);
   function slotsFor(day){
-    const out=[]; for(let m=toMin(day.start); m+C.slotMinutes<=toMin(day.end); m+=C.slotMinutes){
+    const out=[]; for(let m=toMin(day.start); m+C.slotMinutes<=toMin(day.end); m+=C.slotMinutes+(C.bufferMinutes||0)){
       const time=fromMin(m); out.push({time, taken: C.taken.includes(day.date+" "+time)});
     } return out;
   }

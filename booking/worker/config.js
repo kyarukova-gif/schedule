@@ -5,6 +5,7 @@ export const CONFIG = {
   priceTotal: 100,        // стоимость съёмки, €
   deposit: 20,            // предоплата сейчас, € (невозвратная)
   slotMinutes: 30,        // длительность съёмки
+  bufferMinutes: 5,       // перерыв между съёмками (следующая начнётся через 30+5 = 35 мин)
   timezone: "Europe/Berlin", // часовой пояс места съёмок (для скрытия прошедших слотов)
   instagram: "your_instagram", // без @
 

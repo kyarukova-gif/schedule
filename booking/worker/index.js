@@ -14,7 +14,7 @@ const slotKey = (date, time) => `slot:${date} ${time}`;
 
 function timesFor(day) {
   const out = [];
-  for (let m = toMin(day.start); m + CONFIG.slotMinutes <= toMin(day.end); m += CONFIG.slotMinutes) out.push(fromMin(m));
+  for (let m = toMin(day.start); m + CONFIG.slotMinutes <= toMin(day.end); m += CONFIG.slotMinutes + (CONFIG.bufferMinutes || 0)) out.push(fromMin(m));
   return out;
 }
 
