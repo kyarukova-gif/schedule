@@ -3,100 +3,129 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Рождественская фотосессия — запись</title>
-<meta name="description" content="Запись на 30-минутную фотосессию на рождественском рынке. Предоплата 20 €.">
-<meta name="theme-color" content="#14382b">
+<title>Marché de Noël · Nice — фотосессия</title>
+<meta name="description" content="Экспресс-фотосессия на Marché de Noël в Ницце. 30 минут, до 100 кадров.">
+<meta name="theme-color" content="#0d261d">
 <style>
   :root{
-    --bg:#f7f1e6; --card:#fffdf8; --ink:#1d2a24; --mute:#6d746f;
-    --green:#14382b; --green-2:#1f5240; --gold:#c9963b; --red:#b3392f;
-    --line:#e6dcc8; --radius:18px;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{ --bg:#0f1c17; --card:#16271f; --ink:#f3ecdc; --mute:#9aa9a1;
-           --line:#2a3f35; --green:#e9d8a8; --green-2:#f3e7c3; }
-    .hero{ background:linear-gradient(160deg,#0b1a14,#17382b) !important; }
-    .btn{ color:#14382b !important; }
+    --night:#0d261d; --night2:#17402f; --cream:#fbf4e2; --ink:#1d2a24; --mute:#6d746f;
+    --gold:#e0b25a; --gold-d:#b8892f; --red:#c8423a; --green:#14382b; --line:#e8dcc0; --radius:18px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0}
-  body{background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-       padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+  body{background:var(--night);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       padding-bottom:calc(120px + env(safe-area-inset-bottom));
+       background-image:radial-gradient(circle at 20% 10%,rgba(224,178,90,.08),transparent 40%),radial-gradient(circle at 90% 60%,rgba(200,66,58,.07),transparent 45%)}
   .wrap{max-width:520px;margin:0 auto;padding:0 16px}
+  .serif{font-family:Georgia,"Times New Roman",serif}
 
-  .hero{background:linear-gradient(160deg,#14382b,#1f5240);color:#fbf4e2;padding:48px 16px 34px;text-align:center;position:relative;overflow:hidden}
-  .hero::before,.hero::after{content:"✦";position:absolute;color:var(--gold);opacity:.55;font-size:18px}
-  .hero::before{left:22px;top:20px}.hero::after{right:26px;top:48px;font-size:12px}
-  .hero h1{margin:0 0 6px;font:600 28px/1.15 Georgia,"Times New Roman",serif;letter-spacing:.2px}
-  .hero p{margin:0;opacity:.85}
-  .pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-  .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 12px;border-radius:99px;font-size:14px}
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;color:var(--cream);text-align:center;padding:100px 16px 38px;
+        background:linear-gradient(180deg,#071812 0%,var(--night2) 100%)}
+  #snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .garland{position:absolute;left:0;right:0;top:0;height:46px;display:flex;justify-content:space-around;padding:0 4px;pointer-events:none}
+  .garland::before{content:"";position:absolute;left:-10px;right:-10px;top:-18px;height:40px;border-bottom:2px solid #5b4a22;border-radius:0 0 50% 50%/0 0 100% 100%}
+  .bulb{position:relative;top:10px;width:10px;height:15px;border-radius:50% 50% 55% 55%;animation:tw 2.4s ease-in-out infinite}
+  .bulb::before{content:"";position:absolute;left:2px;top:-4px;width:6px;height:5px;background:#5b4a22;border-radius:2px}
+  .bulb:nth-child(4n+1){background:var(--gold);box-shadow:0 0 12px 3px rgba(224,178,90,.7)}
+  .bulb:nth-child(4n+2){background:#ff6b5e;box-shadow:0 0 12px 3px rgba(255,107,94,.65);animation-delay:.6s}
+  .bulb:nth-child(4n+3){background:#fff3d1;box-shadow:0 0 12px 3px rgba(255,243,209,.6);animation-delay:1.2s}
+  .bulb:nth-child(4n){background:#7ed9a4;box-shadow:0 0 12px 3px rgba(126,217,164,.6);animation-delay:1.8s}
+  .bulb:nth-child(even){top:16px}
+  @keyframes tw{0%,100%{opacity:1}50%{opacity:.45}}
+  .eyebrow{position:relative;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+  .hero h1{position:relative;margin:6px 0 4px;font:italic 600 40px/1.05 Georgia,"Times New Roman",serif}
+  .hero h1 small{display:block;font:600 14px/1.4 -apple-system,sans-serif;font-style:normal;letter-spacing:.3em;text-transform:uppercase;margin-top:8px;color:#f3e7c3}
+  .hero p{position:relative;margin:14px auto 0;max-width:380px;opacity:.9}
+  .pills{position:relative;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  .pill{background:rgba(255,255,255,.1);border:1px solid rgba(224,178,90,.45);padding:6px 12px;border-radius:99px;font-size:14px}
+  .lang{position:absolute;right:12px;top:54px;display:flex;gap:4px;z-index:2}
+  .lang button{background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--cream);border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer;font-family:inherit}
+  .lang button.on{background:var(--cream);color:var(--green)}
 
-  .lang{position:absolute;right:12px;top:10px;display:flex;gap:4px;z-index:2}
-  .lang button{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fbf4e2;border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer}
-  .lang button.on{background:#fbf4e2;color:#14382b}
+  /* ---------- sections ---------- */
+  section{margin-top:26px}
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#f1e3bd;margin:0 0 10px;font-weight:600}
+  h2 .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#3b2a05;margin-right:8px;font-size:12px;letter-spacing:0;font-weight:700}
+  h2 .opt{text-transform:none;letter-spacing:0;font-weight:400;opacity:.7;margin-left:6px}
+  .card{background:var(--cream);border-radius:var(--radius);padding:16px}
 
-  section{margin-top:22px}
-  h2{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:600}
-  h2 .n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--gold);color:#fff;margin-right:8px;font-size:12px;letter-spacing:0}
+  .inc{list-style:none;margin:0;padding:0}
+  .inc li{display:flex;gap:12px;align-items:flex-start;padding:8px 0}
+  .inc li+li{border-top:1px dashed var(--line)}
+  .inc .ic{font-size:22px;line-height:1.2;flex:none;width:28px;text-align:center}
+  .idea{margin:14px 0 0;font:italic 17px/1.45 Georgia,serif;color:#f3e7c3;text-align:center;padding:0 6px}
 
   .days{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .day{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:12px 6px;text-align:center;cursor:pointer;font:inherit;color:inherit}
+  .day{background:var(--cream);border:2px solid transparent;border-radius:var(--radius);padding:12px 6px;text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
   .day .wd{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
   .day .d{font:600 28px/1.1 Georgia,serif;margin:2px 0}
   .day .m{font-size:13px;color:var(--mute)}
-  .day .left{font-size:11px;margin-top:6px;color:var(--green-2)}
-  .day.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,150,59,.25)}
-  .day.full{opacity:.45}
-  .place{margin:10px 2px 0;font-size:14px;color:var(--mute)}
+  .day .left{font-size:11px;margin-top:6px;color:var(--green)}
+  .day.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(224,178,90,.35)}
+  .day.full{opacity:.4}
+  .place{margin:10px 2px 0;font-size:14px;color:#f1e3bd}
 
   .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .slot{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:13px 0;font-family:inherit;font-weight:600;font-size:16px;color:inherit;cursor:pointer;text-align:center}
-  .slot.on{background:var(--green);border-color:var(--green);color:#fff}
-  .slot:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
-  .hint{color:var(--mute);font-size:14px;padding:14px;text-align:center;background:var(--card);border:1px dashed var(--line);border-radius:14px}
+  .slot{background:var(--cream);border:2px solid transparent;border-radius:14px;padding:13px 0;font-family:inherit;font-weight:600;font-size:16px;color:var(--ink);cursor:pointer;text-align:center}
+  .slot.on{background:var(--red);color:#fff}
+  .slot:disabled{opacity:.3;text-decoration:line-through;cursor:not-allowed}
+  .hint{color:#f1e3bd;font-size:14px;padding:14px;text-align:center;border:1px dashed rgba(224,178,90,.5);border-radius:14px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--cream);border:2px solid transparent;border-radius:99px;padding:9px 14px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+  .chip.on{background:var(--gold);border-color:var(--gold-d);font-weight:600}
+  .sub{font-size:13px;color:#f1e3bd;opacity:.8;margin:0 0 10px}
 
   .field{display:block;margin-bottom:12px}
-  .field span{display:block;font-size:13px;color:var(--mute);margin:0 0 5px 2px}
-  .field input{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+  .field span{display:block;font-size:13px;color:#f1e3bd;margin:0 0 5px 2px}
+  .field input{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:14px;border:2px solid transparent;background:var(--cream);color:var(--ink)}
   .field input:focus{outline:none;border-color:var(--gold)}
-  .field input.bad{border-color:var(--red)}
+  .field input.bad{border-color:#ff7b6e}
 
-  .sum{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
   .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0}
   .row.big{font-weight:700;font-size:18px;border-top:1px dashed var(--line);margin-top:6px;padding-top:12px}
   .row .k{color:var(--mute)}
-  .sel{font-weight:600}
+  .sel{font-weight:600;text-align:right}
   .check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:14px;cursor:pointer}
-  .check input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--green-2)}
+  .check input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--green)}
   .check.bad{color:var(--red)}
+  .check.mac{margin-top:0;padding:14px 0 2px;font-size:15px}
+  .info{display:flex;gap:10px;background:rgba(224,178,90,.14);border:1px solid rgba(224,178,90,.4);color:#f3e7c3;padding:12px 14px;border-radius:14px;font-size:14px;margin-top:12px}
 
-  .bar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:18px 16px calc(14px + env(safe-area-inset-bottom));z-index:5}
-  .btn{display:block;width:100%;max-width:520px;margin:0 auto;border:0;border-radius:16px;padding:17px;font-family:inherit;font-weight:700;font-size:17px;color:#fff;background:var(--green);cursor:pointer;box-shadow:0 8px 20px rgba(20,56,43,.28)}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,var(--night) 70%,transparent);padding:18px 16px calc(14px + env(safe-area-inset-bottom));z-index:5}
+  .btn{display:block;width:100%;max-width:520px;margin:0 auto;border:0;border-radius:16px;padding:17px;font-family:inherit;font-weight:700;font-size:17px;color:#fff;background:linear-gradient(180deg,#d4503f,#b53228);cursor:pointer;box-shadow:0 8px 22px rgba(200,66,58,.4)}
   .btn:active{transform:translateY(1px)}
-  .btn[disabled]{opacity:.5}
-  .secure{text-align:center;font-size:12px;color:var(--mute);margin-top:8px}
-  footer{margin:28px 0 0;text-align:center;font-size:13px;color:var(--mute)}
+  .btn[disabled]{opacity:.55}
+  .secure{text-align:center;font-size:12px;color:#f1e3bd;opacity:.75;margin-top:8px}
+  footer{margin:28px 0 0;text-align:center;font-size:13px;color:#f1e3bd;opacity:.85}
   footer a{color:inherit}
-  .toast{position:fixed;left:16px;right:16px;bottom:110px;max-width:488px;margin:0 auto;background:#2b2b2b;color:#fff;padding:12px 14px;border-radius:12px;font-size:14px;z-index:9;display:none}
-  .info{display:flex;gap:10px;background:#fff6dd;border:1px solid #efd9a0;color:#5a4614;padding:12px 14px;border-radius:14px;font-size:14px;margin-top:12px}
-  @media (prefers-color-scheme: dark){ .info{background:#2c2812;border-color:#5a4d1c;color:#e9d8a8} }
+  .toast{position:fixed;left:16px;right:16px;bottom:110px;max-width:488px;margin:0 auto;background:#fff;color:#222;padding:12px 14px;border-radius:12px;font-size:14px;z-index:9;display:none;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} }
 </style>
 </head>
 <body>
 
 <header class="hero">
+  <canvas id="snow"></canvas>
+  <div class="garland" id="garland"></div>
   <div class="lang" id="lang"></div>
-  <h1 data-i="title"></h1>
+  <div class="eyebrow" data-i="eyebrow"></div>
+  <h1>Marché de Noël<small data-i="city"></small></h1>
   <p data-i="sub"></p>
   <div class="pills">
     <span class="pill" id="pillDur"></span>
+    <span class="pill" data-i="pillPhotos"></span>
     <span class="pill" id="pillPrice"></span>
-    <span class="pill" data-i="pillDeposit"></span>
   </div>
 </header>
 
 <main class="wrap">
+  <section>
+    <div class="card"><ul class="inc" id="inc"></ul></div>
+    <p class="idea" data-i="idea"></p>
+  </section>
+
   <section>
     <h2><span class="n">1</span><span data-i="stepDay"></span></h2>
     <div class="days" id="days"></div>
@@ -109,15 +138,22 @@
   </section>
 
   <section>
-    <h2><span class="n">3</span><span data-i="stepYou"></span></h2>
-    <label class="field"><span data-i="name"></span><input id="name" autocomplete="name"></label>
-    <label class="field"><span data-i="insta"></span><input id="insta" autocapitalize="none" autocorrect="off" placeholder="@username"></label>
-    <label class="field"><span data-i="phone"></span><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+49 170 1234567"></label>
+    <h2><span class="n">3</span><span data-i="stepMood"></span><span class="opt" data-i="optional"></span></h2>
+    <p class="sub" data-i="moodSub"></p>
+    <div class="chips" id="moods"></div>
+    <label class="check mac" style="color:#f3e7c3"><input type="checkbox" id="mac"><span data-i="mac"></span></label>
   </section>
 
   <section>
-    <h2><span class="n">4</span><span data-i="stepPay"></span></h2>
-    <div class="sum">
+    <h2><span class="n">4</span><span data-i="stepYou"></span></h2>
+    <label class="field"><span data-i="name"></span><input id="name" autocomplete="name"></label>
+    <label class="field"><span data-i="insta"></span><input id="insta" autocapitalize="none" autocorrect="off" placeholder="@username"></label>
+    <label class="field"><span data-i="phone"></span><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78"></label>
+  </section>
+
+  <section>
+    <h2><span class="n">5</span><span data-i="stepPay"></span></h2>
+    <div class="card">
       <div class="row"><span class="k" data-i="when"></span><span class="sel" id="sumWhen">—</span></div>
       <div class="row"><span class="k" data-i="shoot"></span><span id="sumTotal"></span></div>
       <div class="row"><span class="k" data-i="onsite"></span><span id="sumRest"></span></div>
@@ -140,53 +176,75 @@
 <script>
 (function(){
   const API = (window.BOOKING.apiUrl||"").replace(/\/$/,"");
-  let C = {days:[],taken:[],priceTotal:0,deposit:0,slotMinutes:30,instagram:""};
+  let C = {days:[],taken:[],priceTotal:0,deposit:0,slotMinutes:30,bufferMinutes:0,instagram:"",now:""};
+  let rest = 0;
 
   // ---------- переводы ----------
   const T = {
-    ru:{title:"Рождественская фотосессия",sub:"Полчаса на рождественском рынке — и тёплые кадры на память",
-      pillDeposit:"предоплата {dep} €",stepDay:"Выбери день",stepTime:"Выбери время",stepYou:"Твои данные",
-      stepPay:"Проверь и оплати предоплату",name:"Имя",insta:"Твой Instagram",phone:"Телефон для связи",errInsta:"Проверь Instagram (например @anna)",errPhone:"Проверь номер телефона",taken:"Это время только что заняли — выбери другое",errNet:"Не получилось, попробуй ещё раз",loading:"Загружаю расписание…",paidTitle:"Ты записана! 🎄",paidText:"Предоплата получена. Я напишу тебе в Instagram или на телефон, чтобы подтвердить детали.",paidClose:"Закрыть",
+    ru:{eyebrow:"Экспресс-фотосессии",city:"Ницца",sub:"Полчаса на рождественском рынке — тёплые кадры и состояние, с которым хочется встретить новый год",
+      pillPhotos:"до 100 фото",
+      inc1:"30 минут съёмки",inc2:"До 100 фотографий во всех основных локациях рынка",inc3:"Обработка за 2 рабочих дня",inc4:"Мини-работа с МАК-картами — по желанию",
+      idea:"Мы будем ловить целевое состояние, в котором ты хочешь провести следующий год.",
+      stepDay:"Выбери день",stepTime:"Выбери время",stepMood:"Какое состояние ловим?",optional:"по желанию",
+      moodSub:"Фототерапия — по желанию. Не хочешь — просто попроси красивый новогодний контент 🙂",
+      m_relaxed:"Расслабленность",m_sensual:"Сексуальность",m_light:"Лёгкость",m_bold:"Решительность и смелость",m_newyear:"Просто новогодний контент",
+      mac:"Хочу мини-работу с МАК-картами",
+      stepYou:"Твои данные",stepPay:"Проверь и оплати предоплату",name:"Имя",insta:"Твой Instagram",phone:"Телефон для связи",
       when:"Когда",shoot:"Съёмка {min} мин",onsite:"Остаток на месте",payNow:"Платишь сейчас",
       agree:"Понимаю, что предоплата {dep} € невозвратная. Остаток {rest} € оплачиваю на съёмке.",
       weather:"Съёмка проходит на улице. Если погода сложная — перенесём на другой фотодень, предоплата сохранится.",
       questions:"Вопросы? Пиши в Instagram",secure:"Оплата через Stripe · Apple Pay и Google Pay",
-      pick:"Выбери день и время",btn:"Оплатить {dep} € и забронировать",btnPick:"Выбери день и время",
+      btn:"Оплатить {dep} € и забронировать",btnPick:"Выбери день и время",
       pickDay:"Сначала выбери день",left:"свободно {n}",full:"занято",
-      need:"Заполни поля",needAgree:"Подтверди условия предоплаты",needTime:"Выбери время",
-      min:"мин",
-      wd:["вс","пн","вт","ср","чт","пт","сб"],mo:["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"],
+      need:"Заполни имя",needAgree:"Подтверди условия предоплаты",needTime:"Выбери время",
+      errInsta:"Проверь Instagram (например @anna)",errPhone:"Проверь номер телефона",taken:"Это время только что заняли — выбери другое",errNet:"Не получилось, попробуй ещё раз",
+      paidTitle:"Ты записана!",paidText:"Предоплата получена. Я напишу тебе в Instagram или на телефон, чтобы подтвердить детали.",paidClose:"Закрыть",
+      min:"мин",wd:["вс","пн","вт","ср","чт","пт","сб"],mo:["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"],
       moFull:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]},
-    en:{title:"Christmas Photoshoot",sub:"30 minutes at the Christmas market — warm photos to keep",
-      pillDeposit:"{dep} € deposit",stepDay:"Pick a day",stepTime:"Pick a time",stepYou:"Your details",
-      stepPay:"Review & pay the deposit",name:"Name",insta:"Your Instagram",phone:"Phone number",errInsta:"Check your Instagram (e.g. @anna)",errPhone:"Check your phone number",taken:"That time was just taken — pick another",errNet:"Something went wrong, please try again",loading:"Loading schedule…",paidTitle:"You're booked! 🎄",paidText:"Deposit received. I'll message you on Instagram or by phone to confirm the details.",paidClose:"Close",
+    en:{eyebrow:"Express photoshoots",city:"Nice",sub:"Thirty minutes at the Christmas market — warm photos and the state you want to take into the new year",
+      pillPhotos:"up to 100 photos",
+      inc1:"30-minute session",inc2:"Up to 100 photos across all the main spots of the market",inc3:"Edited within 2 working days",inc4:"Mini session with MAC cards — optional",
+      idea:"We'll catch the target state you want to live in next year.",
+      stepDay:"Pick a day",stepTime:"Pick a time",stepMood:"Which state are we catching?",optional:"optional",
+      moodSub:"The phototherapy twist is optional. Not into it? Just ask for pretty New Year content 🙂",
+      m_relaxed:"Relaxed",m_sensual:"Sensual",m_light:"Light",m_bold:"Decisive & bold",m_newyear:"Just New Year content",
+      mac:"I'd like a mini session with MAC cards",
+      stepYou:"Your details",stepPay:"Review & pay the deposit",name:"Name",insta:"Your Instagram",phone:"Phone number",
       when:"When",shoot:"{min}-min session",onsite:"Balance on site",payNow:"Pay now",
       agree:"I understand the {dep} € deposit is non-refundable. I'll pay the {rest} € balance at the shoot.",
       weather:"The shoot is outdoors. If the weather is bad, we'll move you to another photo day — your deposit carries over.",
       questions:"Questions? DM on Instagram",secure:"Secure payment via Stripe · Apple Pay & Google Pay",
-      pick:"Pick a day and time",btn:"Pay {dep} € & book",btnPick:"Pick a day and time",
+      btn:"Pay {dep} € & book",btnPick:"Pick a day and time",
       pickDay:"Pick a day first",left:"{n} left",full:"full",
-      need:"Please fill in the fields",needAgree:"Please accept the deposit terms",needTime:"Pick a time",
-      min:"min",
-      wd:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mo:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      need:"Please enter your name",needAgree:"Please accept the deposit terms",needTime:"Pick a time",
+      errInsta:"Check your Instagram (e.g. @anna)",errPhone:"Check your phone number",taken:"That time was just taken — pick another",errNet:"Something went wrong, please try again",
+      paidTitle:"You're booked!",paidText:"Deposit received. I'll message you on Instagram or by phone to confirm the details.",paidClose:"Close",
+      min:"min",wd:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mo:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
       moFull:["January","February","March","April","May","June","July","August","September","October","November","December"]},
-    de:{title:"Weihnachts-Fotoshooting",sub:"30 Minuten auf dem Weihnachtsmarkt — warme Bilder zur Erinnerung",
-      pillDeposit:"{dep} € Anzahlung",stepDay:"Tag wählen",stepTime:"Uhrzeit wählen",stepYou:"Deine Daten",
-      stepPay:"Prüfen & Anzahlung zahlen",name:"Name",insta:"Dein Instagram",phone:"Telefonnummer",errInsta:"Instagram prüfen (z. B. @anna)",errPhone:"Telefonnummer prüfen",taken:"Diese Zeit wurde gerade vergeben — bitte andere wählen",errNet:"Etwas ist schiefgelaufen, bitte erneut versuchen",loading:"Lade Termine…",paidTitle:"Du bist gebucht! 🎄",paidText:"Anzahlung erhalten. Ich melde mich per Instagram oder Telefon, um die Details zu bestätigen.",paidClose:"Schließen",
-      when:"Wann",shoot:"Shooting {min} Min.",onsite:"Rest vor Ort",payNow:"Jetzt zahlen",
-      agree:"Mir ist klar, dass die Anzahlung von {dep} € nicht erstattet wird. Den Rest ({rest} €) zahle ich vor Ort.",
-      weather:"Das Shooting findet draußen statt. Bei schlechtem Wetter verschieben wir auf einen anderen Fototag — die Anzahlung bleibt gültig.",
-      questions:"Fragen? Schreib mir auf Instagram",secure:"Sichere Zahlung über Stripe · Apple Pay & Google Pay",
-      pick:"Tag und Uhrzeit wählen",btn:"{dep} € zahlen & buchen",btnPick:"Tag und Uhrzeit wählen",
-      pickDay:"Bitte zuerst einen Tag wählen",left:"{n} frei",full:"voll",
-      need:"Bitte Felder ausfüllen",needAgree:"Bitte Anzahlungsbedingungen bestätigen",needTime:"Uhrzeit wählen",
-      min:"Min.",
-      wd:["So","Mo","Di","Mi","Do","Fr","Sa"],mo:["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],
-      moFull:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]}
+    fr:{eyebrow:"Shootings express",city:"Nice",sub:"Trente minutes au marché de Noël — de belles photos et l'état d'esprit avec lequel entrer dans la nouvelle année",
+      pillPhotos:"jusqu'à 100 photos",
+      inc1:"30 minutes de shooting",inc2:"Jusqu'à 100 photos dans tous les lieux principaux du marché",inc3:"Retouches sous 2 jours ouvrés",inc4:"Mini-séance avec les cartes MAC — en option",
+      idea:"On capte l'état que tu veux vivre l'année prochaine.",
+      stepDay:"Choisis un jour",stepTime:"Choisis l'heure",stepMood:"Quel état on capte ?",optional:"en option",
+      moodSub:"La touche « phototherapie » est facultative. Pas envie ? Demande simplement de jolies photos du Nouvel An 🙂",
+      m_relaxed:"Détente",m_sensual:"Sensualité",m_light:"Légèreté",m_bold:"Détermination et audace",m_newyear:"Juste des photos du Nouvel An",
+      mac:"Je veux une mini-séance avec les cartes MAC",
+      stepYou:"Tes coordonnées",stepPay:"Vérifie et paie l'acompte",name:"Prénom",insta:"Ton Instagram",phone:"Téléphone",
+      when:"Quand",shoot:"Shooting {min} min",onsite:"Reste sur place",payNow:"À payer maintenant",
+      agree:"Je comprends que l'acompte de {dep} € n'est pas remboursable. Je paie les {rest} € restants sur place.",
+      weather:"Le shooting a lieu en extérieur. Si la météo est mauvaise, on te reporte à un autre jour — l'acompte reste valable.",
+      questions:"Des questions ? Écris-moi sur Instagram",secure:"Paiement sécurisé via Stripe · Apple Pay et Google Pay",
+      btn:"Payer {dep} € et réserver",btnPick:"Choisis un jour et une heure",
+      pickDay:"Choisis d'abord un jour",left:"{n} libres",full:"complet",
+      need:"Indique ton prénom",needAgree:"Confirme les conditions de l'acompte",needTime:"Choisis une heure",
+      errInsta:"Vérifie ton Instagram (ex. @anna)",errPhone:"Vérifie ton numéro de téléphone",taken:"Ce créneau vient d'être pris — choisis-en un autre",errNet:"Une erreur est survenue, réessaie",
+      paidTitle:"C'est réservé !",paidText:"Acompte reçu. Je t'écris sur Instagram ou par téléphone pour confirmer les détails.",paidClose:"Fermer",
+      min:"min",wd:["dim","lun","mar","mer","jeu","ven","sam"],mo:["janv","févr","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"],
+      moFull:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]}
   };
-  let rest = 0;
+  const MOODS = ["relaxed","sensual","light","bold","newyear"];
   let lang = "ru";
-  try{ lang = localStorage.getItem("lang") || ((navigator.language||"ru").slice(0,2)); }catch(e){}
+  try{ lang = localStorage.getItem("lang") || (navigator.language||"ru").slice(0,2); }catch(e){}
   if(!T[lang]) lang = "ru";
 
   const $ = id => document.getElementById(id);
@@ -198,30 +256,38 @@
   const toMin = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
   const fromMin = n => pad(Math.floor(n/60))+":"+pad(n%60);
   function slotsFor(day){
-    const out=[]; for(let m=toMin(day.start); m+C.slotMinutes<=toMin(day.end); m+=C.slotMinutes+(C.bufferMinutes||0)){
-      const time=fromMin(m); out.push({time, taken: C.taken.includes(day.date+" "+time)});
+    const out=[];
+    for(let m=toMin(day.start); m+C.slotMinutes<=toMin(day.end); m+=C.slotMinutes+(C.bufferMinutes||0)){
+      const time=fromMin(m); out.push({time, taken: C.taken.includes(day.date+" "+time) || (day.date+" "+time) <= (C.now||"")});
     } return out;
   }
   const dObj = ds => { const [y,m,d]=ds.split("-").map(Number); return new Date(y,m-1,d); };
-  const todayStr = () => (C.now||"").slice(0,10);
 
-  let selDay = null, selTime = null;
+  let selDay = null, selTime = null; const selMoods = new Set();
 
   // ---------- рендер ----------
   function renderLang(){
     $("lang").innerHTML = Object.keys(T).map(l=>`<button class="${l===lang?"on":""}" data-l="${l}">${l.toUpperCase()}</button>`).join("");
     $("lang").querySelectorAll("button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem("lang",lang)}catch(e){};renderAll()});
   }
+  function renderStatic(){
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
+    $("pillDur").textContent = "⏱ "+C.slotMinutes+" "+T[lang].min;
+    $("pillPrice").textContent = C.priceTotal ? "💶 "+C.priceTotal+" €" : "";
+    $("inc").innerHTML = [["⏱","inc1"],["📷","inc2"],["✨","inc3"],["🃏","inc4"]].map(([i,k])=>`<li><span class="ic">${i}</span><span>${t(k)}</span></li>`).join("");
+    $("moods").innerHTML = MOODS.map(m=>`<button type="button" class="chip ${selMoods.has(m)?"on":""}" data-m="${m}">${t("m_"+m)}</button>`).join("");
+    $("moods").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{ const m=b.dataset.m; selMoods.has(m)?selMoods.delete(m):selMoods.add(m); b.classList.toggle("on"); });
+    const ig=$("igLink"); ig.textContent=C.instagram?"@"+C.instagram:""; ig.href="https://instagram.com/"+C.instagram;
+  }
   function renderDays(){
     $("days").innerHTML = C.days.map(day=>{
-      const d=dObj(day.date), past = day.date < todayStr();
-      const free = slotsFor(day).filter(s=>!s.taken).length;
-      const full = free===0 || past;
+      const d=dObj(day.date), free = slotsFor(day).filter(s=>!s.taken).length, full = free===0;
       return `<button class="day ${selDay===day.date?"on":""} ${full?"full":""}" data-d="${day.date}" ${full?"disabled":""}>
         <div class="wd">${T[lang].wd[d.getDay()]}</div><div class="d">${d.getDate()}</div><div class="m">${T[lang].mo[d.getMonth()]}</div>
         <div class="left">${full?t("full"):t("left",{n:free})}</div></button>`;
     }).join("");
-    $("days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{selDay=b.dataset.d;selTime=null;renderAll(true)});
+    $("days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{selDay=b.dataset.d;selTime=null;renderAll()});
     const day = C.days.find(x=>x.date===selDay);
     $("place").textContent = day ? "📍 "+day.place : "";
   }
@@ -230,7 +296,7 @@
     if(!day){ $("slots").innerHTML = `<div class="hint">${t("pickDay")}</div>`; return; }
     $("slots").innerHTML = `<div class="slots">`+slotsFor(day).map(s=>
       `<button class="slot ${selTime===s.time?"on":""}" data-t="${s.time}" ${s.taken?"disabled":""}>${s.time}</button>`).join("")+`</div>`;
-    $("slots").querySelectorAll(".slot").forEach(b=>b.onclick=()=>{selTime=b.dataset.t;renderAll(true)});
+    $("slots").querySelectorAll(".slot").forEach(b=>b.onclick=()=>{selTime=b.dataset.t;renderAll()});
   }
   function whenText(){
     if(!selDay||!selTime) return "—";
@@ -244,18 +310,10 @@
     $("sumDep").textContent = C.deposit+" €";
     $("go").textContent = (selDay&&selTime) ? t("btn") : t("btnPick");
   }
-  function renderStatic(){
-    document.documentElement.lang = lang;
-    document.querySelectorAll("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
-    $("pillDur").textContent = "⏱ "+C.slotMinutes+" "+T[lang].min;
-    $("pillPrice").textContent = "💶 "+C.priceTotal+" €";
-    const ig=$("igLink"); ig.textContent="@"+C.instagram; ig.href="https://instagram.com/"+C.instagram;
-  }
-  function renderAll(keepScroll){ renderLang(); renderStatic(); renderDays(); renderSlots(); renderSummary(); }
+  function renderAll(){ renderLang(); renderStatic(); renderDays(); renderSlots(); renderSummary(); }
 
   // ---------- оплата ----------
   function toast(msg){ const el=$("toast"); el.textContent=msg; el.style.display="block"; clearTimeout(toast.t); toast.t=setTimeout(()=>el.style.display="none",3200); }
-  const slug = s => s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,30) || "guest";
 
   $("go").onclick = async () => {
     ["name","insta","phone"].forEach(id=>$(id).classList.remove("bad"));
@@ -275,10 +333,10 @@
     $("go").disabled = true;
     try{
       const r = await fetch(API+"/api/checkout",{method:"POST",headers:{"content-type":"application/json"},
-        body:JSON.stringify({date:selDay,time:selTime,name,instagram:insta,phone,lang})});
+        body:JSON.stringify({date:selDay,time:selTime,name,instagram:insta,phone,lang,moods:[...selMoods],mac:$("mac").checked})});
       const j = await r.json().catch(()=>({}));
       if(r.ok && j.url){ location.href = j.url; return; }
-      if(r.status===409){ toast(t("taken")); selTime=null; await load(); return; }
+      if(r.status===409){ toast(t("taken")); selTime=null; await load(); $("go").disabled=false; return; }
       if(j.error==="bad_instagram"){ $("insta").classList.add("bad"); toast(t("errInsta")); }
       else if(j.error==="bad_phone"){ $("phone").classList.add("bad"); toast(t("errPhone")); }
       else toast(t("errNet"));
@@ -294,24 +352,39 @@
     }catch(e){ toast(t("errNet")); }
     renderAll();
   }
-  // свежие данные при возвращении на вкладку (чтобы не выбрать чужой слот)
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) load(); });
 
-  // экран после успешной оплаты
+  // ---------- экран после оплаты ----------
   const q = new URLSearchParams(location.search);
   if(q.get("paid")==="1"){
     const ov=document.createElement("div");
-    ov.style.cssText="position:fixed;inset:0;z-index:20;background:var(--bg);display:grid;place-items:center;padding:24px;text-align:center";
-    const slot=q.get("slot")||"";
-    ov.innerHTML=`<div><div style="font-size:56px">🎄</div><h1 style="font:600 28px Georgia,serif;margin:10px 0" id="pt"></h1>
-      <p style="font-weight:600;margin:0 0 8px">${slot.replace(/[<>&"]/g,"")}</p><p style="color:var(--mute);max-width:340px;margin:0 auto 20px" id="pp"></p>
+    ov.style.cssText="position:fixed;inset:0;z-index:20;background:var(--night);color:var(--cream);display:grid;place-items:center;padding:24px;text-align:center";
+    const slot=(q.get("slot")||"").replace(/[<>&"']/g,"");
+    ov.innerHTML=`<div><div style="font-size:56px">🎄</div><h1 class="serif" style="font-style:italic;font-size:30px;margin:10px 0" id="pt"></h1>
+      <p style="font-weight:600;margin:0 0 8px;color:var(--gold)">${slot}</p><p style="opacity:.85;max-width:340px;margin:0 auto 20px" id="pp"></p>
       <button class="btn" style="position:static" id="pc"></button></div>`;
     document.body.appendChild(ov);
-    const fill=()=>{ $("pt").textContent=t("paidTitle").replace("🎄","").trim(); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose"); };
-    fill(); $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
+    $("pt").textContent=t("paidTitle"); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose");
+    $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
   }
 
-  renderStatic(); renderLang(); load();
+  // ---------- гирлянда и снег ----------
+  $("garland").innerHTML = Array.from({length:16},()=>'<i class="bulb"></i>').join("");
+  (function snow(){
+    const cv=$("snow"), ctx=cv.getContext("2d"); if(!ctx||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let w,h,flakes=[]; const dpr=Math.min(devicePixelRatio||1,2);
+    function size(){ const r=cv.parentElement.getBoundingClientRect(); w=r.width;h=r.height;cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+      flakes=Array.from({length:Math.round(w/9)},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*2.2+.6,v:Math.random()*.6+.25,d:Math.random()*Math.PI*2})); }
+    size(); addEventListener("resize",size);
+    (function tick(){
+      ctx.clearRect(0,0,w,h); ctx.fillStyle="rgba(255,255,255,.85)";
+      for(const f of flakes){ f.y+=f.v; f.d+=.01; f.x+=Math.sin(f.d)*.35; if(f.y>h+4){f.y=-4;f.x=Math.random()*w}
+        ctx.globalAlpha=Math.min(1,f.r/2.2+.25); ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,6.283); ctx.fill(); }
+      requestAnimationFrame(tick);
+    })();
+  })();
+
+  renderAll(); load();
 })();
 </script>
 </body>

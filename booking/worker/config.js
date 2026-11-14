@@ -6,13 +6,13 @@ export const CONFIG = {
   deposit: 20,            // предоплата сейчас, € (невозвратная)
   slotMinutes: 30,        // длительность съёмки
   bufferMinutes: 5,       // перерыв между съёмками (следующая начнётся через 30+5 = 35 мин)
-  timezone: "Europe/Berlin", // часовой пояс места съёмок (для скрытия прошедших слотов)
-  instagram: "your_instagram", // без @
+  timezone: "Europe/Paris", // часовой пояс места съёмок (для скрытия прошедших слотов)
+  instagram: "grapeprofoto", // без @
 
   // ЗАМЕНИ ДАТЫ НА СВОИ. date — YYYY-MM-DD, start/end — часы работы.
   days: [
-    { date: "2026-12-12", start: "13:00", end: "18:00", place: "Рождественский рынок, у большой ёлки" },
-    { date: "2026-12-13", start: "13:00", end: "18:00", place: "Рождественский рынок, у большой ёлки" },
-    { date: "2026-12-19", start: "13:00", end: "18:00", place: "Рождественский рынок, у большой ёлки" }
+    { date: "2026-12-12", start: "13:00", end: "18:00", place: "Marché de Noël, Nice" },
+    { date: "2026-12-13", start: "13:00", end: "18:00", place: "Marché de Noël, Nice" },
+    { date: "2026-12-19", start: "13:00", end: "18:00", place: "Marché de Noël, Nice" }
   ]
 };

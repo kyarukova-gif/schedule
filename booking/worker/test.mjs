@@ -28,10 +28,11 @@ assert.equal((await call("/api/checkout","POST",{...person,time:"14:30"})).statu
 assert.equal((await call("/api/checkout","POST",{...person,date:"2026-12-25"})).status,400);
 
 // 1. слот держится
-let r = await call("/api/checkout","POST",person); assert.equal(r.status,200);
+let r = await call("/api/checkout","POST",{...person,lang:"fr",moods:["bold","hack","light"],mac:true}); assert.equal(r.status,200);
 assert.match((await r.json()).url,/checkout.stripe.com/);
 assert.match(stripeCalls[0],/unit_amount%5D=2000|unit_amount\]=2000/);
 assert.ok(stripeCalls[0].includes("anna.photo") && !stripeCalls[0].includes("%40%40"));
+assert.ok(/mood%5D=bold%2Clight|mood\]=bold,light/.test(stripeCalls[0]),stripeCalls[0]); assert.ok(/mac_cards%5D=yes/.test(stripeCalls[0])); assert.ok(/locale=fr/.test(stripeCalls[0]));
 // 2. второй человек на тот же слот -> 409
 assert.equal((await call("/api/checkout","POST",{...person,name:"Bob"})).status,409);
 assert.ok((await (await call("/api/config","GET")).json()).taken.includes("2026-12-12 14:45"));

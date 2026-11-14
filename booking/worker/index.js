@@ -4,6 +4,7 @@
 //   POST /api/webhook  -> Stripe сообщает про оплату/истечение, слот закрывается/освобождается
 import { CONFIG } from "./config.js";
 
+const MOODS = ["relaxed", "sensual", "light", "bold", "newyear"];
 const HOLD_SECONDS = 31 * 60;       // Stripe требует, чтобы сессия жила минимум 30 минут
 const SESSION_SECONDS = 30 * 60 + 30;
 
@@ -81,14 +82,16 @@ async function handleCheckout(request, env) {
   if (!name) return json(env, { error: "bad_name" }, 400);
   if (!instagram) return json(env, { error: "bad_instagram" }, 400);
   if (!phone) return json(env, { error: "bad_phone" }, 400);
-  const lang = ["ru", "en", "de"].includes(b.lang) ? b.lang : "auto";
+  const lang = ["ru", "en", "fr"].includes(b.lang) ? b.lang : "auto";
+  const moods = (Array.isArray(b.moods) ? b.moods : []).filter(m => MOODS.includes(m)).join(",");
+  const mac = b.mac === true ? "yes" : "no";
 
   const key = slotKey(date, time);
   if (await env.SLOTS.get(key)) return json(env, { error: "taken" }, 409);
   // Сразу держим слот, пока человек платит
   await env.SLOTS.put(key, JSON.stringify({ status: "held", at: Date.now() }), { expirationTtl: HOLD_SECONDS });
 
-  const meta = { slot: `${date} ${time}`, name, instagram: "@" + instagram, phone };
+  const meta = { slot: `${date} ${time}`, name, instagram: "@" + instagram, phone, mood: moods || "-", mac_cards: mac };
   const site = (env.SITE_URL || "").replace(/\/$/, "");
   const body = stripeForm({
     mode: "payment",
@@ -150,7 +153,7 @@ async function handleWebhook(request, env) {
       // Закрываем слот навсегда
       await env.SLOTS.put(key, JSON.stringify({
         status: "booked", session: s.id, name: s.metadata.name, instagram: s.metadata.instagram,
-        phone: s.metadata.phone, email: s.customer_details && s.customer_details.email, at: Date.now()
+        phone: s.metadata.phone, mood: s.metadata.mood, mac_cards: s.metadata.mac_cards, email: s.customer_details && s.customer_details.email, at: Date.now()
       }));
     }
   } else if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {
