@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Рождественская фотосессия — запись</title>
+<meta name="description" content="Запись на 30-минутную фотосессию на рождественском рынке. Предоплата 20 €.">
+<meta name="theme-color" content="#14382b">
+<style>
+  :root{
+    --bg:#f7f1e6; --card:#fffdf8; --ink:#1d2a24; --mute:#6d746f;
+    --green:#14382b; --green-2:#1f5240; --gold:#c9963b; --red:#b3392f;
+    --line:#e6dcc8; --radius:18px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0f1c17; --card:#16271f; --ink:#f3ecdc; --mute:#9aa9a1;
+           --line:#2a3f35; --green:#e9d8a8; --green-2:#f3e7c3; }
+    .hero{ background:linear-gradient(160deg,#0b1a14,#17382b) !important; }
+    .btn{ color:#14382b !important; }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px}
+
+  .hero{background:linear-gradient(160deg,#14382b,#1f5240);color:#fbf4e2;padding:48px 16px 34px;text-align:center;position:relative;overflow:hidden}
+  .hero::before,.hero::after{content:"✦";position:absolute;color:var(--gold);opacity:.55;font-size:18px}
+  .hero::before{left:22px;top:20px}.hero::after{right:26px;top:48px;font-size:12px}
+  .hero h1{margin:0 0 6px;font:600 28px/1.15 Georgia,"Times New Roman",serif;letter-spacing:.2px}
+  .hero p{margin:0;opacity:.85}
+  .pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 12px;border-radius:99px;font-size:14px}
+
+  .lang{position:absolute;right:12px;top:10px;display:flex;gap:4px;z-index:2}
+  .lang button{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fbf4e2;border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer}
+  .lang button.on{background:#fbf4e2;color:#14382b}
+
+  section{margin-top:22px}
+  h2{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:600}
+  h2 .n{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--gold);color:#fff;margin-right:8px;font-size:12px;letter-spacing:0}
+
+  .days{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .day{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:12px 6px;text-align:center;cursor:pointer;font:inherit;color:inherit}
+  .day .wd{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+  .day .d{font:600 28px/1.1 Georgia,serif;margin:2px 0}
+  .day .m{font-size:13px;color:var(--mute)}
+  .day .left{font-size:11px;margin-top:6px;color:var(--green-2)}
+  .day.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,150,59,.25)}
+  .day.full{opacity:.45}
+  .place{margin:10px 2px 0;font-size:14px;color:var(--mute)}
+
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .slot{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:13px 0;font-family:inherit;font-weight:600;font-size:16px;color:inherit;cursor:pointer;text-align:center}
+  .slot.on{background:var(--green);border-color:var(--green);color:#fff}
+  .slot:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+  .hint{color:var(--mute);font-size:14px;padding:14px;text-align:center;background:var(--card);border:1px dashed var(--line);border-radius:14px}
+
+  .field{display:block;margin-bottom:12px}
+  .field span{display:block;font-size:13px;color:var(--mute);margin:0 0 5px 2px}
+  .field input{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+  .field input:focus{outline:none;border-color:var(--gold)}
+  .field input.bad{border-color:var(--red)}
+
+  .sum{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0}
+  .row.big{font-weight:700;font-size:18px;border-top:1px dashed var(--line);margin-top:6px;padding-top:12px}
+  .row .k{color:var(--mute)}
+  .sel{font-weight:600}
+  .check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:14px;cursor:pointer}
+  .check input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--green-2)}
+  .check.bad{color:var(--red)}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:18px 16px calc(14px + env(safe-area-inset-bottom));z-index:5}
+  .btn{display:block;width:100%;max-width:520px;margin:0 auto;border:0;border-radius:16px;padding:17px;font-family:inherit;font-weight:700;font-size:17px;color:#fff;background:var(--green);cursor:pointer;box-shadow:0 8px 20px rgba(20,56,43,.28)}
+  .btn:active{transform:translateY(1px)}
+  .btn[disabled]{opacity:.5}
+  .secure{text-align:center;font-size:12px;color:var(--mute);margin-top:8px}
+  footer{margin:28px 0 0;text-align:center;font-size:13px;color:var(--mute)}
+  footer a{color:inherit}
+  .toast{position:fixed;left:16px;right:16px;bottom:110px;max-width:488px;margin:0 auto;background:#2b2b2b;color:#fff;padding:12px 14px;border-radius:12px;font-size:14px;z-index:9;display:none}
+  .info{display:flex;gap:10px;background:#fff6dd;border:1px solid #efd9a0;color:#5a4614;padding:12px 14px;border-radius:14px;font-size:14px;margin-top:12px}
+  @media (prefers-color-scheme: dark){ .info{background:#2c2812;border-color:#5a4d1c;color:#e9d8a8} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="lang" id="lang"></div>
+  <h1 data-i="title"></h1>
+  <p data-i="sub"></p>
+  <div class="pills">
+    <span class="pill" id="pillDur"></span>
+    <span class="pill" id="pillPrice"></span>
+    <span class="pill" data-i="pillDeposit"></span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2><span class="n">1</span><span data-i="stepDay"></span></h2>
+    <div class="days" id="days"></div>
+    <div class="place" id="place"></div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span><span data-i="stepTime"></span></h2>
+    <div id="slots"></div>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span><span data-i="stepYou"></span></h2>
+    <label class="field"><span data-i="name"></span><input id="name" autocomplete="name"></label>
+    <label class="field"><span data-i="email"></span><input id="email" type="email" inputmode="email" autocomplete="email"></label>
+  </section>
+
+  <section>
+    <h2><span class="n">4</span><span data-i="stepPay"></span></h2>
+    <div class="sum">
+      <div class="row"><span class="k" data-i="when"></span><span class="sel" id="sumWhen">—</span></div>
+      <div class="row"><span class="k" data-i="shoot"></span><span id="sumTotal"></span></div>
+      <div class="row"><span class="k" data-i="onsite"></span><span id="sumRest"></span></div>
+      <div class="row big"><span data-i="payNow"></span><span id="sumDep"></span></div>
+      <label class="check" id="agreeBox"><input type="checkbox" id="agree"><span data-i="agree"></span></label>
+    </div>
+    <div class="info"><span>🎄</span><span data-i="weather"></span></div>
+  </section>
+
+  <footer><span data-i="questions"></span> <a id="igLink" target="_blank" rel="noopener"></a></footer>
+</main>
+
+<div class="bar">
+  <button class="btn" id="go"></button>
+  <div class="secure" data-i="secure"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+  const C = window.BOOKING;
+
+  // ---------- переводы ----------
+  const T = {
+    ru:{title:"Рождественская фотосессия",sub:"Полчаса на рождественском рынке — и тёплые кадры на память",
+      pillDeposit:"предоплата {dep} €",stepDay:"Выбери день",stepTime:"Выбери время",stepYou:"Твои данные",
+      stepPay:"Проверь и оплати предоплату",name:"Имя",email:"Email (для чека Stripe)",
+      when:"Когда",shoot:"Съёмка {min} мин",onsite:"Остаток на месте",payNow:"Платишь сейчас",
+      agree:"Понимаю, что предоплата {dep} € невозвратная. Остаток {rest} € оплачиваю на съёмке.",
+      weather:"Съёмка проходит на улице. Если погода сложная — перенесём на другой фотодень, предоплата сохранится.",
+      questions:"Вопросы? Пиши в Instagram",secure:"Оплата через Stripe · Apple Pay и Google Pay",
+      pick:"Выбери день и время",btn:"Оплатить {dep} € и забронировать",btnPick:"Выбери день и время",
+      pickDay:"Сначала выбери день",left:"свободно {n}",full:"занято",
+      need:"Заполни поля",needAgree:"Подтверди условия предоплаты",needTime:"Выбери время",
+      stub:"Ссылка Stripe ещё не вставлена в config.js",min:"мин",
+      wd:["вс","пн","вт","ср","чт","пт","сб"],mo:["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"],
+      moFull:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]},
+    en:{title:"Christmas Photoshoot",sub:"30 minutes at the Christmas market — warm photos to keep",
+      pillDeposit:"{dep} € deposit",stepDay:"Pick a day",stepTime:"Pick a time",stepYou:"Your details",
+      stepPay:"Review & pay the deposit",name:"Name",email:"Email (for Stripe receipt)",
+      when:"When",shoot:"{min}-min session",onsite:"Balance on site",payNow:"Pay now",
+      agree:"I understand the {dep} € deposit is non-refundable. I'll pay the {rest} € balance at the shoot.",
+      weather:"The shoot is outdoors. If the weather is bad, we'll move you to another photo day — your deposit carries over.",
+      questions:"Questions? DM on Instagram",secure:"Secure payment via Stripe · Apple Pay & Google Pay",
+      pick:"Pick a day and time",btn:"Pay {dep} € & book",btnPick:"Pick a day and time",
+      pickDay:"Pick a day first",left:"{n} left",full:"full",
+      need:"Please fill in the fields",needAgree:"Please accept the deposit terms",needTime:"Pick a time",
+      stub:"Stripe link isn't set in config.js yet",min:"min",
+      wd:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mo:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      moFull:["January","February","March","April","May","June","July","August","September","October","November","December"]},
+    de:{title:"Weihnachts-Fotoshooting",sub:"30 Minuten auf dem Weihnachtsmarkt — warme Bilder zur Erinnerung",
+      pillDeposit:"{dep} € Anzahlung",stepDay:"Tag wählen",stepTime:"Uhrzeit wählen",stepYou:"Deine Daten",
+      stepPay:"Prüfen & Anzahlung zahlen",name:"Name",email:"E-Mail (für den Stripe-Beleg)",
+      when:"Wann",shoot:"Shooting {min} Min.",onsite:"Rest vor Ort",payNow:"Jetzt zahlen",
+      agree:"Mir ist klar, dass die Anzahlung von {dep} € nicht erstattet wird. Den Rest ({rest} €) zahle ich vor Ort.",
+      weather:"Das Shooting findet draußen statt. Bei schlechtem Wetter verschieben wir auf einen anderen Fototag — die Anzahlung bleibt gültig.",
+      questions:"Fragen? Schreib mir auf Instagram",secure:"Sichere Zahlung über Stripe · Apple Pay & Google Pay",
+      pick:"Tag und Uhrzeit wählen",btn:"{dep} € zahlen & buchen",btnPick:"Tag und Uhrzeit wählen",
+      pickDay:"Bitte zuerst einen Tag wählen",left:"{n} frei",full:"voll",
+      need:"Bitte Felder ausfüllen",needAgree:"Bitte Anzahlungsbedingungen bestätigen",needTime:"Uhrzeit wählen",
+      stub:"Stripe-Link fehlt noch in config.js",min:"Min.",
+      wd:["So","Mo","Di","Mi","Do","Fr","Sa"],mo:["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],
+      moFull:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"]}
+  };
+  const rest = C.priceTotal - C.deposit;
+  let lang = "ru";
+  try{ lang = localStorage.getItem("lang") || ((navigator.language||"ru").slice(0,2)); }catch(e){}
+  if(!T[lang]) lang = "ru";
+
+  const $ = id => document.getElementById(id);
+  const fmt = (s, extra) => s.replace(/\{(\w+)\}/g,(_,k)=>({dep:C.deposit,rest,min:C.slotMinutes,...extra}[k]));
+  const t = (k, extra) => fmt(T[lang][k], extra);
+
+  // ---------- слоты ----------
+  const pad = n => String(n).padStart(2,"0");
+  const toMin = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
+  const fromMin = n => pad(Math.floor(n/60))+":"+pad(n%60);
+  const taken = new Set(C.taken);
+  function slotsFor(day){
+    const out=[]; for(let m=toMin(day.start); m+C.slotMinutes<=toMin(day.end); m+=C.slotMinutes){
+      const time=fromMin(m); out.push({time, taken: taken.has(day.date+" "+time)});
+    } return out;
+  }
+  const dObj = ds => { const [y,m,d]=ds.split("-").map(Number); return new Date(y,m-1,d); };
+  const todayStr = () => { const n=new Date(); return n.getFullYear()+"-"+pad(n.getMonth()+1)+"-"+pad(n.getDate()); };
+
+  let selDay = null, selTime = null;
+
+  // ---------- рендер ----------
+  function renderLang(){
+    $("lang").innerHTML = Object.keys(T).map(l=>`<button class="${l===lang?"on":""}" data-l="${l}">${l.toUpperCase()}</button>`).join("");
+    $("lang").querySelectorAll("button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem("lang",lang)}catch(e){};renderAll()});
+  }
+  function renderDays(){
+    $("days").innerHTML = C.days.map(day=>{
+      const d=dObj(day.date), past = day.date < todayStr();
+      const free = slotsFor(day).filter(s=>!s.taken).length;
+      const full = free===0 || past;
+      return `<button class="day ${selDay===day.date?"on":""} ${full?"full":""}" data-d="${day.date}" ${full?"disabled":""}>
+        <div class="wd">${T[lang].wd[d.getDay()]}</div><div class="d">${d.getDate()}</div><div class="m">${T[lang].mo[d.getMonth()]}</div>
+        <div class="left">${full?t("full"):t("left",{n:free})}</div></button>`;
+    }).join("");
+    $("days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{selDay=b.dataset.d;selTime=null;renderAll(true)});
+    const day = C.days.find(x=>x.date===selDay);
+    $("place").textContent = day ? "📍 "+day.place : "";
+  }
+  function renderSlots(){
+    const day = C.days.find(x=>x.date===selDay);
+    if(!day){ $("slots").innerHTML = `<div class="hint">${t("pickDay")}</div>`; return; }
+    $("slots").innerHTML = `<div class="slots">`+slotsFor(day).map(s=>
+      `<button class="slot ${selTime===s.time?"on":""}" data-t="${s.time}" ${s.taken?"disabled":""}>${s.time}</button>`).join("")+`</div>`;
+    $("slots").querySelectorAll(".slot").forEach(b=>b.onclick=()=>{selTime=b.dataset.t;renderAll(true)});
+  }
+  function whenText(){
+    if(!selDay||!selTime) return "—";
+    const d=dObj(selDay), end=fromMin(toMin(selTime)+C.slotMinutes);
+    return `${d.getDate()} ${T[lang].moFull[d.getMonth()]}, ${selTime}–${end}`;
+  }
+  function renderSummary(){
+    $("sumWhen").textContent = whenText();
+    $("sumTotal").textContent = C.priceTotal+" €";
+    $("sumRest").textContent = rest+" €";
+    $("sumDep").textContent = C.deposit+" €";
+    $("go").textContent = (selDay&&selTime) ? t("btn") : t("btnPick");
+  }
+  function renderStatic(){
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
+    $("pillDur").textContent = "⏱ "+C.slotMinutes+" "+T[lang].min;
+    $("pillPrice").textContent = "💶 "+C.priceTotal+" €";
+    const ig=$("igLink"); ig.textContent="@"+C.instagram; ig.href="https://instagram.com/"+C.instagram;
+  }
+  function renderAll(keepScroll){ renderLang(); renderStatic(); renderDays(); renderSlots(); renderSummary(); }
+
+  // ---------- оплата ----------
+  function toast(msg){ const el=$("toast"); el.textContent=msg; el.style.display="block"; clearTimeout(toast.t); toast.t=setTimeout(()=>el.style.display="none",3200); }
+  const slug = s => s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,30) || "guest";
+
+  $("go").onclick = () => {
+    ["name","email"].forEach(id=>$(id).classList.remove("bad"));
+    $("agreeBox").classList.remove("bad");
+    if(!selDay || !selTime){ toast(t("needTime")); $("slots").scrollIntoView({behavior:"smooth",block:"center"}); return; }
+    const name=$("name").value.trim(), email=$("email").value.trim();
+    let bad=false;
+    if(!name){ $("name").classList.add("bad"); bad=true; }
+    if(!/^\S+@\S+\.\S+$/.test(email)){ $("email").classList.add("bad"); bad=true; }
+    if(bad){ toast(t("need")); ($("name").classList.contains("bad")?$("name"):$("email")).focus(); return; }
+    if(!$("agree").checked){ $("agreeBox").classList.add("bad"); toast(t("needAgree")); $("agreeBox").scrollIntoView({behavior:"smooth",block:"center"}); return; }
+    if(C.stripeLink.includes("REPLACE_ME")){ toast(t("stub")); return; }
+
+    // слот и имя уходят в Stripe как client_reference_id — видно в платеже
+    const ref = `${selDay}_${selTime.replace(":","")}_${slug(name)}`;
+    const url = new URL(C.stripeLink);
+    url.searchParams.set("client_reference_id", ref);
+    url.searchParams.set("prefilled_email", email);
+    url.searchParams.set("locale", lang);
+    try{ localStorage.setItem("lastBooking", JSON.stringify({ref,name})) }catch(e){}
+    $("go").disabled = true;
+    location.href = url.toString();
+  };
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
