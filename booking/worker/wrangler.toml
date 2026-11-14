@@ -6,6 +6,8 @@ compatibility_date = "2026-01-01"
 # Адрес, где лежит страница записи (без слэша на конце)
 SITE_URL = "https://REPLACE_ME.github.io/schedule/booking"
 ALLOWED_ORIGIN = "https://REPLACE_ME.github.io"
+# Куда присылать письма о новых записях
+NOTIFY_EMAIL = "REPLACE_WITH_YOUR_EMAIL"
 
 [[kv_namespaces]]
 binding = "SLOTS"

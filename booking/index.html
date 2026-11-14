@@ -101,6 +101,22 @@
   footer{margin:28px 0 0;text-align:center;font-size:13px;color:#f1e3bd;opacity:.85}
   footer a{color:inherit}
   .toast{position:fixed;left:16px;right:16px;bottom:110px;max-width:488px;margin:0 auto;background:#fff;color:#222;padding:12px 14px;border-radius:12px;font-size:14px;z-index:9;display:none;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+  .who{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600}
+  .stepper{display:flex;align-items:center;gap:6px}
+  .stepper button{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:#fff;font-size:24px;line-height:1;color:var(--green);cursor:pointer;font-family:inherit}
+  .stepper button:disabled{opacity:.35}
+  .stepper b{min-width:38px;text-align:center;font:600 24px Georgia,serif}
+  .pkgs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .pkg{background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px 10px;text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
+  .pkg .pm{font:600 22px Georgia,serif}
+  .pkg .pp{font-size:18px;font-weight:700;margin:2px 0;color:var(--red)}
+  .pkg .pd{font-size:12px;color:var(--mute)}
+  .pkg.on{border-color:var(--gold);background:#fff8e6;box-shadow:0 0 0 3px rgba(224,178,90,.35)}
+  .tip{margin-top:12px;background:#fff3d1;border:1px solid #e8cf8a;border-radius:12px;padding:10px 12px;font-size:14px}
+  .tip button{margin-left:6px;border:0;background:var(--green);color:#fff;border-radius:99px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+  .field textarea{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:14px;border:2px solid transparent;background:var(--cream);color:var(--ink);resize:vertical;min-height:84px}
+  .field textarea:focus{outline:none;border-color:var(--gold)}
+  [hidden]{display:none !important}
   @media (prefers-reduced-motion: reduce){ .bulb{animation:none} }
 </style>
 </head>
@@ -127,34 +143,46 @@
   </section>
 
   <section>
-    <h2><span class="n">1</span><span data-i="stepDay"></span></h2>
+    <h2><span class="n">1</span><span data-i="stepWho"></span></h2>
+    <div class="card">
+      <div class="who"><span data-i="people"></span>
+        <div class="stepper"><button type="button" id="pminus" aria-label="-">−</button><b id="pcount">1</b><button type="button" id="pplus" aria-label="+">+</button></div></div>
+      <div class="pkgs" id="pkgs"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span><span data-i="stepDay"></span></h2>
     <div class="days" id="days"></div>
     <div class="place" id="place"></div>
   </section>
 
   <section>
-    <h2><span class="n">2</span><span data-i="stepTime"></span></h2>
+    <h2><span class="n">3</span><span data-i="stepTime"></span></h2>
     <div id="slots"></div>
   </section>
 
   <section>
-    <h2><span class="n">3</span><span data-i="stepMood"></span><span class="opt" data-i="optional"></span></h2>
+    <h2><span class="n">4</span><span data-i="stepMood"></span><span class="opt" data-i="optional"></span></h2>
     <p class="sub" data-i="moodSub"></p>
     <div class="chips" id="moods"></div>
     <label class="check mac" style="color:#f3e7c3"><input type="checkbox" id="mac"><span data-i="mac"></span></label>
   </section>
 
   <section>
-    <h2><span class="n">4</span><span data-i="stepYou"></span></h2>
+    <h2><span class="n">5</span><span data-i="stepYou"></span></h2>
     <label class="field"><span data-i="name"></span><input id="name" autocomplete="name"></label>
     <label class="field"><span data-i="insta"></span><input id="insta" autocapitalize="none" autocorrect="off" placeholder="@username"></label>
     <label class="field"><span data-i="phone"></span><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78"></label>
+    <label class="field"><span data-i="wishes"></span><textarea id="wishes" maxlength="400" rows="3" data-ph="wishesPh"></textarea></label>
   </section>
 
   <section>
-    <h2><span class="n">5</span><span data-i="stepPay"></span></h2>
+    <h2><span class="n">6</span><span data-i="stepPay"></span></h2>
     <div class="card">
       <div class="row"><span class="k" data-i="when"></span><span class="sel" id="sumWhen">—</span></div>
+      <div class="row"><span class="k" data-i="people"></span><span id="sumPeople"></span></div>
       <div class="row"><span class="k" data-i="shoot"></span><span id="sumTotal"></span></div>
       <div class="row"><span class="k" data-i="onsite"></span><span id="sumRest"></span></div>
       <div class="row big"><span data-i="payNow"></span><span id="sumDep"></span></div>
@@ -176,16 +204,17 @@
 <script>
 (function(){
   const API = (window.BOOKING.apiUrl||"").replace(/\/$/,"");
-  let C = {days:[],taken:[],priceTotal:0,deposit:0,slotMinutes:30,bufferMinutes:0,instagram:"",now:""};
-  let rest = 0;
+  let C = {packages:[{minutes:30,price:0,deposit:0}],maxPeople:15,recommendedMaxFor30:3,days:[],taken:[],slotMinutes:30,bufferMinutes:0,instagram:"",now:""};
+  let selPkg = 0, people = 1;
+  const pkg = () => C.packages[selPkg] || C.packages[0];
 
   // ---------- переводы ----------
   const T = {
     ru:{eyebrow:"Экспресс-фотосессии",city:"Ницца",sub:"Полчаса на рождественском рынке — тёплые кадры и состояние, с которым хочется встретить новый год",
-      pillPhotos:"до 100 фото",
-      inc1:"30 минут съёмки",inc2:"До 100 фотографий во всех основных локациях рынка",inc3:"Обработка за 2 рабочих дня",inc4:"Мини-работа с МАК-картами — по желанию",
+      pillPhotos:"до 100 фото за 30 мин",
+      inc1:"30 или 60 минут съёмки",inc2:"До 100 фотографий за 30 минут во всех основных локациях рынка",inc3:"Обработка за 2 рабочих дня",inc4:"Мини-работа с МАК-картами — по желанию",
       idea:"Мы будем ловить целевое состояние, в котором ты хочешь провести следующий год.",
-      stepDay:"Выбери день",stepTime:"Выбери время",stepMood:"Какое состояние ловим?",optional:"по желанию",
+      stepWho:"Сколько вас и на сколько?",people:"Количество человек",pkgDesc0:"1–3 человека",pkgDesc1:"компании и большие семьи",tip:"Вас {n} — для такой компании лучше взять час, чтобы все успели.",tipBtn:"Выбрать час",wishes:"Пожелания к съёмке (необязательно)",wishesPh:"Образы, локации, настроение, что-то важное…",stepDay:"Выбери день",stepTime:"Выбери время",stepMood:"Какое состояние ловим?",optional:"по желанию",
       moodSub:"Фототерапия — по желанию. Не хочешь — просто попроси красивый новогодний контент 🙂",
       m_relaxed:"Расслабленность",m_sensual:"Сексуальность",m_light:"Лёгкость",m_bold:"Решительность и смелость",m_newyear:"Просто новогодний контент",
       mac:"Хочу мини-работу с МАК-картами",
@@ -202,10 +231,10 @@
       min:"мин",wd:["вс","пн","вт","ср","чт","пт","сб"],mo:["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"],
       moFull:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]},
     en:{eyebrow:"Express photoshoots",city:"Nice",sub:"Thirty minutes at the Christmas market — warm photos and the state you want to take into the new year",
-      pillPhotos:"up to 100 photos",
-      inc1:"30-minute session",inc2:"Up to 100 photos across all the main spots of the market",inc3:"Edited within 2 working days",inc4:"Mini session with MAC cards — optional",
+      pillPhotos:"up to 100 photos / 30 min",
+      inc1:"30 or 60-minute session",inc2:"Up to 100 photos in 30 minutes across all the main spots of the market",inc3:"Edited within 2 working days",inc4:"Mini session with MAC cards — optional",
       idea:"We'll catch the target state you want to live in next year.",
-      stepDay:"Pick a day",stepTime:"Pick a time",stepMood:"Which state are we catching?",optional:"optional",
+      stepWho:"How many of you, and for how long?",people:"Number of people",pkgDesc0:"1–3 people",pkgDesc1:"groups & big families",tip:"There are {n} of you — for a group like that, an hour is better so everyone is covered.",tipBtn:"Choose 1 hour",wishes:"Wishes for the shoot (optional)",wishesPh:"Looks, locations, mood, anything important…",stepDay:"Pick a day",stepTime:"Pick a time",stepMood:"Which state are we catching?",optional:"optional",
       moodSub:"The phototherapy twist is optional. Not into it? Just ask for pretty New Year content 🙂",
       m_relaxed:"Relaxed",m_sensual:"Sensual",m_light:"Light",m_bold:"Decisive & bold",m_newyear:"Just New Year content",
       mac:"I'd like a mini session with MAC cards",
@@ -222,10 +251,10 @@
       min:"min",wd:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mo:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
       moFull:["January","February","March","April","May","June","July","August","September","October","November","December"]},
     fr:{eyebrow:"Shootings express",city:"Nice",sub:"Trente minutes au marché de Noël — de belles photos et l'état d'esprit avec lequel entrer dans la nouvelle année",
-      pillPhotos:"jusqu'à 100 photos",
-      inc1:"30 minutes de shooting",inc2:"Jusqu'à 100 photos dans tous les lieux principaux du marché",inc3:"Retouches sous 2 jours ouvrés",inc4:"Mini-séance avec les cartes MAC — en option",
+      pillPhotos:"jusqu'à 100 photos / 30 min",
+      inc1:"30 ou 60 minutes de shooting",inc2:"Jusqu'à 100 photos en 30 minutes dans tous les lieux principaux du marché",inc3:"Retouches sous 2 jours ouvrés",inc4:"Mini-séance avec les cartes MAC — en option",
       idea:"On capte l'état que tu veux vivre l'année prochaine.",
-      stepDay:"Choisis un jour",stepTime:"Choisis l'heure",stepMood:"Quel état on capte ?",optional:"en option",
+      stepWho:"Combien êtes-vous, et pour combien de temps ?",people:"Nombre de personnes",pkgDesc0:"1 à 3 personnes",pkgDesc1:"groupes et grandes familles",tip:"Vous êtes {n} — pour un groupe comme le vôtre, une heure vaut mieux pour que tout le monde passe.",tipBtn:"Choisir 1 heure",wishes:"Souhaits pour le shooting (facultatif)",wishesPh:"Looks, lieux, ambiance, tout ce qui compte…",stepDay:"Choisis un jour",stepTime:"Choisis l'heure",stepMood:"Quel état on capte ?",optional:"en option",
       moodSub:"La touche « phototherapie » est facultative. Pas envie ? Demande simplement de jolies photos du Nouvel An 🙂",
       m_relaxed:"Détente",m_sensual:"Sensualité",m_light:"Légèreté",m_bold:"Détermination et audace",m_newyear:"Juste des photos du Nouvel An",
       mac:"Je veux une mini-séance avec les cartes MAC",
@@ -248,17 +277,22 @@
   if(!T[lang]) lang = "ru";
 
   const $ = id => document.getElementById(id);
-  const fmt = (s, extra) => s.replace(/\{(\w+)\}/g,(_,k)=>({dep:C.deposit,rest,min:C.slotMinutes,...extra}[k]));
+  const fmt = (s, extra) => s.replace(/\{(\w+)\}/g,(_,k)=>({dep:pkg().deposit,rest:pkg().price-pkg().deposit,min:pkg().minutes,price:pkg().price,...extra}[k]));
   const t = (k, extra) => fmt(T[lang][k], extra);
 
   // ---------- слоты ----------
   const pad = n => String(n).padStart(2,"0");
   const toMin = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
   const fromMin = n => pad(Math.floor(n/60))+":"+pad(n%60);
+  const STEP = () => C.slotMinutes + (C.bufferMinutes||0);
+  // доступные времена начала для выбранного тарифа: 60 мин занимает 2 ячейки сетки
   function slotsFor(day){
-    const out=[];
-    for(let m=toMin(day.start); m+C.slotMinutes<=toMin(day.end); m+=C.slotMinutes+(C.bufferMinutes||0)){
-      const time=fromMin(m); out.push({time, taken: C.taken.includes(day.date+" "+time) || (day.date+" "+time) <= (C.now||"")});
+    const out=[], mins=pkg().minutes, cells=Math.ceil(mins/STEP());
+    for(let m=toMin(day.start); m+mins<=toMin(day.end); m+=STEP()){
+      const time=fromMin(m);
+      let busy=(day.date+" "+time) <= (C.now||"");
+      for(let i=0;i<cells;i++) if(C.taken.includes(day.date+" "+fromMin(m+i*STEP()))) busy=true;
+      out.push({time, taken:busy});
     } return out;
   }
   const dObj = ds => { const [y,m,d]=ds.split("-").map(Number); return new Date(y,m-1,d); };
@@ -273,8 +307,9 @@
   function renderStatic(){
     document.documentElement.lang = lang;
     document.querySelectorAll("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
-    $("pillDur").textContent = "⏱ "+C.slotMinutes+" "+T[lang].min;
-    $("pillPrice").textContent = C.priceTotal ? "💶 "+C.priceTotal+" €" : "";
+    $("pillDur").textContent = "⏱ "+C.packages.map(p=>p.minutes).join(" / ")+" "+T[lang].min;
+    $("pillPrice").textContent = C.packages[0].price ? "💶 "+C.packages.map(p=>p.price).join(" / ")+" €" : "";
+    document.querySelectorAll("[data-ph]").forEach(el=>el.placeholder=t(el.dataset.ph));
     $("inc").innerHTML = [["⏱","inc1"],["📷","inc2"],["✨","inc3"],["🃏","inc4"]].map(([i,k])=>`<li><span class="ic">${i}</span><span>${t(k)}</span></li>`).join("");
     $("moods").innerHTML = MOODS.map(m=>`<button type="button" class="chip ${selMoods.has(m)?"on":""}" data-m="${m}">${t("m_"+m)}</button>`).join("");
     $("moods").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{ const m=b.dataset.m; selMoods.has(m)?selMoods.delete(m):selMoods.add(m); b.classList.toggle("on"); });
@@ -300,17 +335,34 @@
   }
   function whenText(){
     if(!selDay||!selTime) return "—";
-    const d=dObj(selDay), end=fromMin(toMin(selTime)+C.slotMinutes);
+    const d=dObj(selDay), end=fromMin(toMin(selTime)+pkg().minutes);
     return `${d.getDate()} ${T[lang].moFull[d.getMonth()]}, ${selTime}–${end}`;
   }
   function renderSummary(){
     $("sumWhen").textContent = whenText();
-    $("sumTotal").textContent = C.priceTotal+" €";
-    $("sumRest").textContent = rest+" €";
-    $("sumDep").textContent = C.deposit+" €";
+    $("sumPeople").textContent = people;
+    $("sumTotal").textContent = pkg().price+" €";
+    $("sumRest").textContent = (pkg().price-pkg().deposit)+" €";
+    $("sumDep").textContent = pkg().deposit+" €";
     $("go").textContent = (selDay&&selTime) ? t("btn") : t("btnPick");
   }
-  function renderAll(){ renderLang(); renderStatic(); renderDays(); renderSlots(); renderSummary(); }
+  function renderWho(){
+    $("pcount").textContent = people;
+    $("pminus").disabled = people<=1; $("pplus").disabled = people>=(C.maxPeople||15);
+    $("pkgs").innerHTML = C.packages.map((p,i)=>`<button type="button" class="pkg ${i===selPkg?"on":""}" data-p="${i}">
+      <div class="pm">${p.minutes} ${T[lang].min}</div><div class="pp">${p.price} €</div><div class="pd">${t(i===0?"pkgDesc0":"pkgDesc1")}</div></button>`).join("");
+    $("pkgs").querySelectorAll(".pkg").forEach(b=>b.onclick=()=>{selPkg=+b.dataset.p;renderAll()});
+    const big = selPkg===0 && people>(C.recommendedMaxFor30||3) && C.packages.length>1;
+    $("tip").hidden = !big;
+    if(big){ $("tip").innerHTML = `${t("tip",{n:people})}<button type="button" id="tipBtn">${t("tipBtn")}</button>`;
+      $("tipBtn").onclick=()=>{selPkg=C.packages.length-1;renderAll()}; }
+  }
+  $("pminus").onclick=()=>{ if(people>1){people--;renderAll()} };
+  $("pplus").onclick=()=>{ if(people<(C.maxPeople||15)){people++;renderAll()} };
+  function renderAll(){
+    if(selTime){ const day=C.days.find(x=>x.date===selDay); const ok=day&&slotsFor(day).some(x=>x.time===selTime&&!x.taken); if(!ok) selTime=null; }
+    renderLang(); renderStatic(); renderWho(); renderDays(); renderSlots(); renderSummary();
+  }
 
   // ---------- оплата ----------
   function toast(msg){ const el=$("toast"); el.textContent=msg; el.style.display="block"; clearTimeout(toast.t); toast.t=setTimeout(()=>el.style.display="none",3200); }
@@ -333,7 +385,7 @@
     $("go").disabled = true;
     try{
       const r = await fetch(API+"/api/checkout",{method:"POST",headers:{"content-type":"application/json"},
-        body:JSON.stringify({date:selDay,time:selTime,name,instagram:insta,phone,lang,moods:[...selMoods],mac:$("mac").checked})});
+        body:JSON.stringify({date:selDay,time:selTime,minutes:pkg().minutes,people,name,instagram:insta,phone,wishes:$("wishes").value.trim(),lang,moods:[...selMoods],mac:$("mac").checked})});
       const j = await r.json().catch(()=>({}));
       if(r.ok && j.url){ location.href = j.url; return; }
       if(r.status===409){ toast(t("taken")); selTime=null; await load(); $("go").disabled=false; return; }
@@ -347,7 +399,7 @@
   async function load(){
     try{
       const r = await fetch(API+"/api/config",{cache:"no-store"});
-      C = await r.json(); rest = C.priceTotal - C.deposit;
+      C = await r.json();
       if(selDay && !C.days.find(d=>d.date===selDay)) selDay=null;
     }catch(e){ toast(t("errNet")); }
     renderAll();

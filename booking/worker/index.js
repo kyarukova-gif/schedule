@@ -1,22 +1,28 @@
-// Cloudflare Worker: отдаёт расписание, создаёт оплату в Stripe и сам закрывает слот.
-//   GET  /api/config   -> дни, цены, занятые слоты
-//   POST /api/checkout -> держит слот 30 мин и возвращает ссылку на оплату Stripe
-//   POST /api/webhook  -> Stripe сообщает про оплату/истечение, слот закрывается/освобождается
+// Cloudflare Worker: расписание, оплата в Stripe, автоблокировка слотов, письмо фотографу.
+//   GET  /api/config   -> дни, тарифы, занятые слоты
+//   POST /api/checkout -> держит слот(ы) 30 мин и возвращает ссылку на оплату Stripe
+//   POST /api/webhook  -> Stripe сообщает про оплату/истечение: слот закрывается/освобождается, уходит письмо
 import { CONFIG } from "./config.js";
 
 const MOODS = ["relaxed", "sensual", "light", "bold", "newyear"];
-const HOLD_SECONDS = 31 * 60;       // Stripe требует, чтобы сессия жила минимум 30 минут
+const HOLD_SECONDS = 31 * 60;          // Stripe требует, чтобы сессия жила минимум 30 минут
 const SESSION_SECONDS = 30 * 60 + 30;
 
 const pad = n => String(n).padStart(2, "0");
 const toMin = s => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
 const fromMin = n => pad(Math.floor(n / 60)) + ":" + pad(n % 60);
+const STEP = () => CONFIG.slotMinutes + CONFIG.bufferMinutes;
 const slotKey = (date, time) => `slot:${date} ${time}`;
 
-function timesFor(day) {
-  const out = [];
-  for (let m = toMin(day.start); m + CONFIG.slotMinutes <= toMin(day.end); m += CONFIG.slotMinutes + (CONFIG.bufferMinutes || 0)) out.push(fromMin(m));
-  return out;
+// Подходит ли время начала: попадает в сетку и съёмка укладывается в рабочий день
+function startOk(day, time, minutes) {
+  const m = toMin(time), off = m - toMin(day.start);
+  return off >= 0 && off % STEP() === 0 && m + minutes <= toMin(day.end);
+}
+// Ячейки сетки, которые занимает съёмка: 30 мин = 1 ячейка, 60 мин = 2 ячейки
+function cellKeys(date, time, minutes) {
+  const n = Math.ceil(minutes / STEP());
+  return Array.from({ length: n }, (_, i) => slotKey(date, fromMin(toMin(time) + i * STEP())));
 }
 
 // «сейчас» в часовом поясе съёмок в формате "YYYY-MM-DD HH:MM"
@@ -72,37 +78,46 @@ async function handleCheckout(request, env) {
   let b;
   try { b = await request.json(); } catch { return json(env, { error: "bad_request" }, 400); }
   const { date, time } = b;
+  const pkg = CONFIG.packages.find(p => p.minutes === Number(b.minutes));
+  if (!pkg) return json(env, { error: "bad_package" }, 400);
   const day = CONFIG.days.find(d => d.date === date);
-  if (!day || !timesFor(day).includes(time)) return json(env, { error: "bad_slot" }, 400);
+  if (!day || typeof time !== "string" || !startOk(day, time, pkg.minutes)) return json(env, { error: "bad_slot" }, 400);
   if (`${date} ${time}` <= nowLocal()) return json(env, { error: "past" }, 400);
 
   const name = String(b.name || "").trim().slice(0, 80);
   const instagram = cleanInsta(b.instagram);
   const phone = cleanPhone(b.phone);
+  const people = Number(b.people);
   if (!name) return json(env, { error: "bad_name" }, 400);
   if (!instagram) return json(env, { error: "bad_instagram" }, 400);
   if (!phone) return json(env, { error: "bad_phone" }, 400);
+  if (!Number.isInteger(people) || people < 1 || people > CONFIG.maxPeople) return json(env, { error: "bad_people" }, 400);
+  const wishes = String(b.wishes || "").trim().slice(0, 400);
   const lang = ["ru", "en", "fr"].includes(b.lang) ? b.lang : "auto";
   const moods = (Array.isArray(b.moods) ? b.moods : []).filter(m => MOODS.includes(m)).join(",");
   const mac = b.mac === true ? "yes" : "no";
 
-  const key = slotKey(date, time);
-  if (await env.SLOTS.get(key)) return json(env, { error: "taken" }, 409);
-  // Сразу держим слот, пока человек платит
-  await env.SLOTS.put(key, JSON.stringify({ status: "held", at: Date.now() }), { expirationTtl: HOLD_SECONDS });
+  // Сразу держим все ячейки, пока человек платит
+  const keys = cellKeys(date, time, pkg.minutes);
+  for (const k of keys) if (await env.SLOTS.get(k)) return json(env, { error: "taken" }, 409);
+  const hold = session => JSON.stringify({ status: "held", session, at: Date.now() });
+  for (const k of keys) await env.SLOTS.put(k, hold(undefined), { expirationTtl: HOLD_SECONDS });
 
-  const meta = { slot: `${date} ${time}`, name, instagram: "@" + instagram, phone, mood: moods || "-", mac_cards: mac };
+  const meta = {
+    slot: `${date} ${time}`, minutes: pkg.minutes, people, price: pkg.price, deposit: pkg.deposit,
+    name, instagram: "@" + instagram, phone, mood: moods || "-", mac_cards: mac, wishes: wishes || "-"
+  };
   const site = (env.SITE_URL || "").replace(/\/$/, "");
   const body = stripeForm({
     mode: "payment",
     payment_method_types: ["card"],   // включает Apple Pay и Google Pay
     line_items: [{
       quantity: 1,
-      price_data: { currency: "eur", unit_amount: CONFIG.deposit * 100,
-        product_data: { name: `Фотосессия, предоплата — ${date} ${time}` } }
+      price_data: { currency: "eur", unit_amount: pkg.deposit * 100,
+        product_data: { name: `Фотосессия ${pkg.minutes} мин, предоплата — ${date} ${time}` } }
     }],
     metadata: meta,
-    payment_intent_data: { description: `Фотосессия ${date} ${time} — ${name} @${instagram}`, metadata: meta },
+    payment_intent_data: { description: `Фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
     client_reference_id: `${date}_${time.replace(":", "")}`,
     locale: lang,
     expires_at: Math.floor(Date.now() / 1000) + SESSION_SECONDS,
@@ -117,12 +132,49 @@ async function handleCheckout(request, env) {
   });
   const session = await res.json();
   if (!res.ok) {
-    await env.SLOTS.delete(key);
+    for (const k of keys) await env.SLOTS.delete(k);
     console.error("stripe error", JSON.stringify(session));
     return json(env, { error: "stripe" }, 502);
   }
-  await env.SLOTS.put(key, JSON.stringify({ status: "held", session: session.id, at: Date.now() }), { expirationTtl: HOLD_SECONDS });
+  for (const k of keys) await env.SLOTS.put(k, hold(session.id), { expirationTtl: HOLD_SECONDS });
   return json(env, { url: session.url });
+}
+
+// ---------- письмо фотографу (Resend) ----------
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const MOOD_RU = { relaxed: "расслабленность", sensual: "сексуальность", light: "лёгкость", bold: "решительность и смелость", newyear: "просто новогодний контент" };
+
+async function sendEmail(env, bk) {
+  if (!env.RESEND_API_KEY || !env.NOTIFY_EMAIL) { console.warn("email not configured, skipping"); return; }
+  const end = fromMin(toMin(bk.time) + bk.minutes);
+  const moods = bk.mood && bk.mood !== "-" ? bk.mood.split(",").map(m => MOOD_RU[m] || m).join(", ") : "не выбрано";
+  const rows = [
+    ["Когда", `${bk.date}, ${bk.time}–${end} (${bk.minutes} мин)`],
+    ["Количество человек", bk.people],
+    ["Имя", bk.name],
+    ["Instagram", bk.instagram],
+    ["Телефон", bk.phone],
+    ["Email клиента", bk.email || "—"],
+    ["Состояние", moods],
+    ["МАК-карты", bk.mac_cards === "yes" ? "да" : "нет"],
+    ["Пожелания", bk.wishes && bk.wishes !== "-" ? bk.wishes : "—"],
+    ["Стоимость", `${bk.price} € (предоплата ${bk.deposit} € получена, остаток ${bk.price - bk.deposit} € на съёмке)`]
+  ];
+  const text = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
+  const html = `<h2>🎄 Новая запись: ${esc(bk.date)} ${esc(bk.time)}</h2><table cellpadding="6" style="border-collapse:collapse">` +
+    rows.map(([k, v]) => `<tr><td style="color:#666">${esc(k)}</td><td><b>${esc(v)}</b></td></tr>`).join("") + `</table>`;
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
+    body: JSON.stringify({
+      from: env.MAIL_FROM || "Photo booking <onboarding@resend.dev>",
+      to: [env.NOTIFY_EMAIL],
+      reply_to: bk.email || undefined,
+      subject: `Новая запись: ${bk.date} ${bk.time} — ${bk.name} (${bk.instagram})`,
+      text, html
+    })
+  });
+  if (!res.ok) throw new Error("resend " + res.status + " " + await res.text());
 }
 
 // ---------- проверка подписи Stripe ----------
@@ -144,21 +196,38 @@ async function handleWebhook(request, env) {
     return new Response("bad signature", { status: 400 });
   const event = JSON.parse(raw);
   const s = event.data && event.data.object;
-  const slot = s && s.metadata && s.metadata.slot;
-  if (!slot) return new Response("ok");
-  const key = `slot:${slot}`;
+  const m = s && s.metadata;
+  if (!m || !m.slot) return new Response("ok");
+  const [date, time] = m.slot.split(" ");
+  const minutes = Number(m.minutes) || CONFIG.slotMinutes;
+  const keys = cellKeys(date, time, minutes);
 
   if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
     if (s.payment_status === "paid") {
-      // Закрываем слот навсегда
-      await env.SLOTS.put(key, JSON.stringify({
-        status: "booked", session: s.id, name: s.metadata.name, instagram: s.metadata.instagram,
-        phone: s.metadata.phone, mood: s.metadata.mood, mac_cards: s.metadata.mac_cards, email: s.customer_details && s.customer_details.email, at: Date.now()
-      }));
+      const main = await env.SLOTS.get(keys[0], "json");
+      if (main && main.status === "booked" && main.session === s.id && main.emailed) return new Response("ok"); // повтор события
+      const record = {
+        status: "booked", session: s.id, date, time, minutes, people: Number(m.people) || 1,
+        price: Number(m.price), deposit: Number(m.deposit), name: m.name, instagram: m.instagram, phone: m.phone,
+        mood: m.mood, mac_cards: m.mac_cards, wishes: m.wishes, email: s.customer_details && s.customer_details.email,
+        emailed: false, at: Date.now()
+      };
+      // Закрываем все ячейки навсегда
+      for (const [i, k] of keys.entries()) await env.SLOTS.put(k, JSON.stringify(i === 0 ? record : { status: "booked", session: s.id, part: true }));
+      try {
+        await sendEmail(env, record);
+        record.emailed = true;
+        await env.SLOTS.put(keys[0], JSON.stringify(record));
+      } catch (e) {
+        console.error("email failed", e);
+        return new Response("email failed", { status: 500 }); // Stripe повторит; бронь уже сохранена
+      }
     }
   } else if (event.type === "checkout.session.expired" || event.type === "checkout.session.async_payment_failed") {
-    const cur = await env.SLOTS.get(key, "json");
-    if (cur && cur.status === "held" && cur.session === s.id) await env.SLOTS.delete(key);
+    for (const k of keys) {
+      const cur = await env.SLOTS.get(k, "json");
+      if (cur && cur.status === "held" && cur.session === s.id) await env.SLOTS.delete(k);
+    }
   }
   return new Response("ok");
 }
