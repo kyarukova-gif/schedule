@@ -121,7 +121,13 @@
   .field textarea{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:14px;border:2px solid transparent;background:var(--cream);color:var(--ink);resize:vertical;min-height:84px}
   .field textarea:focus{outline:none;border-color:var(--gold)}
   [hidden]{display:none !important}
-  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} }
+  .gallery{overflow:hidden;padding:14px 0 2px;background:linear-gradient(180deg,var(--night2),var(--night))}
+  .gallery[hidden]{display:none}
+  .track{display:flex;gap:10px;width:max-content;animation:slide var(--dur,40s) linear infinite}
+  .track img{height:230px;width:auto;border-radius:14px;display:block;border:2px solid rgba(224,178,90,.55);background:#10281f}
+  .gallery:active .track{animation-play-state:paused}
+  @keyframes slide{to{transform:translateX(calc(-50% - 5px))}}
+  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} .gallery{overflow-x:auto} .track{animation:none} }
 </style>
 </head>
 <body>
@@ -140,6 +146,8 @@
     <span class="pill" id="pillPrice"></span>
   </div>
 </header>
+
+<div class="gallery" id="gallery" hidden aria-label="Photos"><div class="track" id="track"></div></div>
 
 <main class="wrap">
   <section>
@@ -426,6 +434,15 @@
     $("pt").textContent=t("paidTitle"); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose");
     $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
   }
+
+  // ---------- карусель фотографий (список в config.js → photos) ----------
+  (function carousel(){
+    const list=(window.BOOKING.photos||[]).filter(Boolean); if(!list.length) return;
+    const html=list.map(f=>`<img src="photos/${encodeURI(f)}" alt="" loading="lazy" decoding="async" draggable="false">`).join("");
+    $("track").innerHTML=html+html;                       // дважды — для бесконечной прокрутки
+    $("track").style.setProperty("--dur",Math.max(20,list.length*6)+"s");
+    $("gallery").hidden=false;
+  })();
 
   // ---------- гирлянда и снег ----------
   $("garland").innerHTML = Array.from({length:16},()=>'<i class="bulb"></i>').join("");
