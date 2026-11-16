@@ -4,7 +4,6 @@
 //   POST /api/webhook  -> Stripe сообщает про оплату/истечение: слот закрывается/освобождается, уходит письмо
 import { CONFIG } from "./config.js";
 
-const MOODS = ["relaxed", "sensual", "light", "bold", "newyear"];
 const HOLD_SECONDS = 31 * 60;          // Stripe требует, чтобы сессия жила минимум 30 минут
 const SESSION_SECONDS = 30 * 60 + 30;
 
@@ -94,8 +93,6 @@ async function handleCheckout(request, env) {
   if (!Number.isInteger(people) || people < 1 || people > CONFIG.maxPeople) return json(env, { error: "bad_people" }, 400);
   const wishes = String(b.wishes || "").trim().slice(0, 400);
   const lang = ["ru", "en", "fr"].includes(b.lang) ? b.lang : "auto";
-  const moods = (Array.isArray(b.moods) ? b.moods : []).filter(m => MOODS.includes(m)).join(",");
-  const mac = b.mac === true ? "yes" : "no";
 
   // Сразу держим все ячейки, пока человек платит
   const keys = cellKeys(date, time, pkg.minutes);
@@ -105,7 +102,7 @@ async function handleCheckout(request, env) {
 
   const meta = {
     slot: `${date} ${time}`, minutes: pkg.minutes, people, price: pkg.price, deposit: pkg.deposit,
-    name, instagram: "@" + instagram, phone, mood: moods || "-", mac_cards: mac, wishes: wishes || "-"
+    name, instagram: "@" + instagram, phone, wishes: wishes || "-"
   };
   const site = (env.SITE_URL || "").replace(/\/$/, "");
   const body = stripeForm({
@@ -114,11 +111,11 @@ async function handleCheckout(request, env) {
     line_items: [{
       quantity: 1,
       price_data: { currency: "eur", unit_amount: pkg.deposit * 100,
-        product_data: { name: `Pre-shoot consultation (${pkg.minutes}-min photoshoot ${date} ${time})` } }
+        product_data: { name: `Booking deposit — ${pkg.minutes}-min photoshoot ${date} ${time}` } }
     }],
     metadata: meta,
-    custom_text: { submit: { message: `Pre-shoot consultation: a separate service starting right after payment; non-refundable once provided; credited against the price of the shoot. No 14-day withdrawal right for a shoot on a fixed date. Terms: ${site}/cgv.html` } },
-    payment_intent_data: { description: `Консультация + бронь: фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
+    custom_text: { submit: { message: `Booking deposit (arrhes): reserves your time slot and is credited against the price of the shoot. Non-refundable if you cancel. No 14-day withdrawal right for a shoot on a fixed date. Terms: ${site}/cgv.html` } },
+    payment_intent_data: { description: `Предоплата за бронь: фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
     client_reference_id: `${date}_${time.replace(":", "")}`,
     locale: lang,
     expires_at: Math.floor(Date.now() / 1000) + SESSION_SECONDS,
@@ -143,12 +140,10 @@ async function handleCheckout(request, env) {
 
 // ---------- письмо фотографу (Resend) ----------
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const MOOD_RU = { relaxed: "расслабленность", sensual: "сексуальность", light: "лёгкость", bold: "решительность и смелость", newyear: "просто новогодний контент" };
 
 async function sendEmail(env, bk) {
   if (!env.RESEND_API_KEY || !env.NOTIFY_EMAIL) { console.warn("email not configured, skipping"); return; }
   const end = fromMin(toMin(bk.time) + bk.minutes);
-  const moods = bk.mood && bk.mood !== "-" ? bk.mood.split(",").map(m => MOOD_RU[m] || m).join(", ") : "не выбрано";
   const rows = [
     ["Когда", `${bk.date}, ${bk.time}–${end} (${bk.minutes} мин)`],
     ["Количество человек", bk.people],
@@ -156,10 +151,8 @@ async function sendEmail(env, bk) {
     ["Instagram", bk.instagram],
     ["Телефон", bk.phone],
     ["Email клиента", bk.email || "—"],
-    ["Состояние", moods],
-    ["МАК-карты", bk.mac_cards === "yes" ? "да" : "нет"],
     ["Пожелания", bk.wishes && bk.wishes !== "-" ? bk.wishes : "—"],
-    ["Стоимость", `${bk.price} € (консультация ${bk.deposit} € оплачена и засчитана, остаток ${bk.price - bk.deposit} € на съёмке)`]
+    ["Стоимость", `${bk.price} € (предоплата ${bk.deposit} € получена, остаток ${bk.price - bk.deposit} € на съёмке)`]
   ];
   const text = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
   const html = `<h2>🎄 Новая запись: ${esc(bk.date)} ${esc(bk.time)}</h2><table cellpadding="6" style="border-collapse:collapse">` +
@@ -210,7 +203,7 @@ async function handleWebhook(request, env) {
       const record = {
         status: "booked", session: s.id, date, time, minutes, people: Number(m.people) || 1,
         price: Number(m.price), deposit: Number(m.deposit), name: m.name, instagram: m.instagram, phone: m.phone,
-        mood: m.mood, mac_cards: m.mac_cards, wishes: m.wishes, email: s.customer_details && s.customer_details.email,
+        wishes: m.wishes, email: s.customer_details && s.customer_details.email,
         emailed: false, at: Date.now()
       };
       // Закрываем все ячейки навсегда
