@@ -24,7 +24,7 @@ const T = {
     w1: "Если погода не позволяет провести съёмку, она переносится на другой день по договорённости между вами и фотографом, при наличии свободного времени.",
     w2: "Если вам не подходит ни одно время, предоплата возвращается.",
     terms: "Полные условия", guide: "Гайд по съёмке", contactTitle: "Связаться со мной",
-    ig: "Instagram", mail: "Почта", wa: "WhatsApp", phone: "Телефон",
+    ig: "Instagram", port: "Фотопортфолио", mail: "Почта", wa: "WhatsApp", phone: "Телефон",
     event: "Фотосессия на Marché de Noël (Ницца)", evDesc: "Остаток {rest} € оплачивается на съёмке.",
     footer: "Katherine Grape · фотограф в Ницце"
   },
@@ -44,7 +44,7 @@ const T = {
     w1: "If the weather doesn't allow the shoot, it will be moved to another day by agreement between you and the photographer, subject to availability.",
     w2: "If none of the options suits you, the deposit is refunded.",
     terms: "Full terms", guide: "Shoot guide", contactTitle: "Contact me",
-    ig: "Instagram", mail: "Email", wa: "WhatsApp", phone: "Phone",
+    ig: "Instagram", port: "Photo portfolio", mail: "Email", wa: "WhatsApp", phone: "Phone",
     event: "Photoshoot at the Marché de Noël (Nice)", evDesc: "The remaining {rest} € is paid at the shoot.",
     footer: "Katherine Grape · photographer in Nice"
   },
@@ -64,7 +64,7 @@ const T = {
     w1: "Si la météo ne permet pas de réaliser la séance, elle est reportée à un autre jour, d'un commun accord entre vous et la photographe, selon les disponibilités.",
     w2: "Si aucun créneau ne vous convient, les arrhes sont remboursées.",
     terms: "Conditions complètes", guide: "Guide de la séance", contactTitle: "Me contacter",
-    ig: "Instagram", mail: "E-mail", wa: "WhatsApp", phone: "Téléphone",
+    ig: "Instagram", port: "Portfolio photo", mail: "E-mail", wa: "WhatsApp", phone: "Téléphone",
     event: "Séance photo au Marché de Noël (Nice)", evDesc: "Le solde de {rest} € est à régler sur place.",
     footer: "Katherine Grape · photographe à Nice"
   }
@@ -136,6 +136,7 @@ export function buildClientMail(rec, { config, siteUrl }) {
   const waDigits = String(contact.whatsapp || "").replace(/\D/g, "");
   const contactBtns = [
     btn("https://instagram.com/" + ig, t.ig + " @" + ig, false),
+    config.instagramPortfolio ? btn("https://instagram.com/" + config.instagramPortfolio, t.port + " @" + config.instagramPortfolio, false) : "",
     contact.email ? btn("mailto:" + contact.email, t.mail, false) : "",
     waDigits ? btn("https://wa.me/" + waDigits, t.wa, false) : ""
   ].join("");
@@ -174,7 +175,7 @@ export function buildClientMail(rec, { config, siteUrl }) {
   const text = [t.title, "", fmt(t.hello, v), "", `${t.when}: ${whenLong}`, `${t.dur}: ${rec.minutes} ${t.min}`, `${t.people}: ${rec.people}`, `${t.place}: ${place}`,
     meeting ? `${t.meet}: ${meeting}` : "", "", `${t.cal}: ${gcal}`, "", t.termsTitle + ":", "", t.photosTitle + ":", "- " + t.ph1, "- " + t.ph2, "", t.payTitle + ":", "- " + fmt(t.pay1, v), "- " + fmt(t.pay2, v),
     "", t.weatherTitle + ":", "- " + t.w1, "- " + t.w2, "",
-    `${t.terms}: ${site}/cgv.html`, guide ? `${t.guide}: ${guide}` : "", "", t.contactTitle + ":", `Instagram: https://instagram.com/${ig}`,
+    `${t.terms}: ${site}/cgv.html`, guide ? `${t.guide}: ${guide}` : "", "", t.contactTitle + ":", `Instagram: https://instagram.com/${ig}`, config.instagramPortfolio ? `${t.port}: https://instagram.com/${config.instagramPortfolio}` : "",
     contact.email ? `${t.mail}: ${contact.email}` : "", waDigits ? `WhatsApp: https://wa.me/${waDigits}` : ""].filter(x => x !== "").join("\n");
 
   return { to: rec.email, subject: fmt(t.subject, v), html, text, ics, gcal };

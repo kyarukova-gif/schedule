@@ -13,7 +13,8 @@ export const CONFIG = {
   slotMinutes: 30,          // базовый слот
   bufferMinutes: 5,         // перерыв между съёмками (шаг сетки = 30 + 5 = 35 мин)
   timezone: "Europe/Paris", // часовой пояс места съёмок
-  instagram: "grapeprofoto", // без @
+  instagram: "yarukovka", // основной Instagram, без @
+  instagramPortfolio: "grapeprofoto", // фотопортфолио, без @
 
   // Для письма клиенту после оплаты
   contact: { email: "k.yarukova@gmail.com", whatsapp: "33634181505", phone: "" },   // whatsapp — только цифры с кодом страны, например 33612345678
