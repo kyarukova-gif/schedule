@@ -4,3 +4,5 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # Почта фотографа намеренно публична (условия, контакты), её не нужно считать утечкой
+  SECRETS_SCAN_OMIT_KEYS = "GMAIL_USER,NOTIFY_EMAIL"
