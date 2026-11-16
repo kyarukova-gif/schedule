@@ -111,9 +111,9 @@ async function handleCheckout(request, env) {
     name, instagram: "@" + instagram, phone, wishes: wishes || "-"
   };
   const site = (env.SITE_URL || "").replace(/\/$/, "");
-  const body = stripeForm({
+  const makeBody = types => stripeForm({
     mode: "payment",
-    payment_method_types: ["card"],   // включает Apple Pay и Google Pay
+    payment_method_types: types,   // card: карты, Apple Pay, Google Pay; paypal: PayPal
     line_items: [{
       quantity: 1,
       price_data: { currency: "eur", unit_amount: pkg.deposit * 100,
@@ -130,12 +130,19 @@ async function handleCheckout(request, env) {
     cancel_url: `${site}/`
   });
 
-  const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+  const callStripe = types => fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}`, "content-type": "application/x-www-form-urlencoded" },
-    body
+    body: makeBody(types)
   });
-  const session = await res.json();
+  // PayPal появится на странице оплаты, как только его включат в Stripe.
+  // Пока он не включён, Stripe отклоняет такой запрос, и мы повторяем его только с картами.
+  let res = await callStripe(["card", "paypal"]);
+  let session = await res.json();
+  if (!res.ok && /payment_method|paypal/i.test(JSON.stringify(session.error || {}))) {
+    res = await callStripe(["card"]);
+    session = await res.json();
+  }
   if (!res.ok) {
     for (const k of keys) await env.SLOTS.delete(k);
     console.error("stripe error", JSON.stringify(session));

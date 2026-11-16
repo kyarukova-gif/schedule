@@ -12,8 +12,10 @@ const clientMails=[]; let clientFail=false;
 const env = { sendClientMail: async m => { if (clientFail) throw new Error("smtp down"); clientMails.push(m); }, SLOTS:KV, STRIPE_SECRET_KEY:"sk_test", STRIPE_WEBHOOK_SECRET:"whsec_x", SITE_URL:"https://x.io/booking",
               RESEND_API_KEY:"re_x", NOTIFY_EMAIL:"owner@example.com" };
 const stripeCalls=[], mails=[]; let mailFail=false, n=0;
+let rejectPaypal=false;
 globalThis.fetch = async (url, opt) => {
   if (String(url).includes("resend")) { if(mailFail) return new Response("no",{status:500}); mails.push(JSON.parse(opt.body)); return new Response("{}",{status:200}); }
+  if (rejectPaypal && opt.body.toString().includes("paypal")) return new Response(JSON.stringify({error:{message:"The payment method type provided: paypal is invalid. Please ensure the provided type is activated in your dashboard"}}),{status:400});
   stripeCalls.push(opt.body.toString());
   return new Response(JSON.stringify({id:"cs_"+(++n),url:"https://checkout.stripe.com/c/"+n}),{status:200});
 };
@@ -73,6 +75,12 @@ assert.equal(JSON.parse(store.get("slot:2026-12-21 14:20")).status,"booked");
 assert.equal(mails.length,before+1,"фотографу письмо ушло"); assert.equal(clientMails.length,cBefore);
 clientFail=false; assert.equal((await hook("checkout.session.completed","cs_20","2026-12-21 14:20")).status,200);
 assert.equal(mails.length,before+1,"фотографу второй раз не шлём"); assert.equal(clientMails.length,cBefore+1,"клиенту после повтора ушло");
+// --- PayPal: пока не включён в Stripe, оплата работает только картами; когда включён, PayPal добавляется ---
+{ const n0=stripeCalls.length;
+  rejectPaypal=false; let r2=await call("/api/checkout","POST",{...base,date:"2026-12-01",time:"12:00"}); assert.equal(r2.status,200);
+  assert.ok(decodeURIComponent(stripeCalls[n0]).includes("payment_method_types[1]=paypal"),"PayPal запрашивается");
+  const n1=stripeCalls.length; rejectPaypal=true; r2=await call("/api/checkout","POST",{...base,date:"2026-12-01",time:"12:35"}); assert.equal(r2.status,200,"без PayPal оплата всё равно создаётся");
+  assert.ok(!decodeURIComponent(stripeCalls[n1]).includes("paypal"),"повтор уже без PayPal"); rejectPaypal=false; }
 console.log("ALL OK");
 
 // --- обёртка Netlify Blobs: срок жизни и список ---
