@@ -120,6 +120,8 @@
   .reel{padding:18px 0 4px;background:linear-gradient(180deg,var(--night2),var(--night));display:flex;flex-direction:column;align-items:center;gap:10px}
   .reel[hidden]{display:none}
   .reel video{height:360px;width:auto;max-width:86vw;aspect-ratio:4/5;object-fit:contain;border-radius:16px;display:block;border:2px solid rgba(224,178,90,.55);background:#10281f;cursor:pointer}
+  .reel img{height:360px;width:auto;max-width:86vw;aspect-ratio:2/3;object-fit:contain;border-radius:16px;display:block;border:2px solid rgba(224,178,90,.55);background:#10281f;cursor:pointer;transition:opacity .35s}
+  .reel img[hidden]{display:none}
   .dots{display:flex;gap:6px}
   .dots i{width:7px;height:7px;border-radius:50%;background:rgba(251,244,226,.3)}
   .dots i.on{background:var(--gold)}
@@ -143,7 +145,7 @@
   </div>
 </header>
 
-<div class="reel" id="reel" hidden><video id="reelv" muted playsinline preload="auto" aria-hidden="true"></video><div class="dots" id="dots"></div></div>
+<div class="reel" id="reel" hidden><video id="reelv" muted playsinline preload="auto" aria-hidden="true"></video><img id="reeli" alt="" draggable="false" hidden><div class="dots" id="dots"></div></div>
 
 <main class="wrap">
   <section>
@@ -423,25 +425,51 @@
     $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
   }
 
-  // ---------- видео по очереди (список в config.js → videos) ----------
+  // ---------- видео по очереди, затем показ фото (списки в config.js → videos, photos) ----------
   (function reel(){
-    const list=(window.BOOKING.videos||[]).filter(Boolean); if(!list.length) return;
-    const v=$("reelv"), dots=$("dots"), reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const vids=(window.BOOKING.videos||[]).filter(Boolean), pics=(window.BOOKING.photos||[]).filter(Boolean);
+    const items=[...vids.map(f=>({t:"v",f})), ...(pics.length?[{t:"p"}]:[])];
+    if(!items.length) return;
+    const v=$("reelv"), im=$("reeli"), dots=$("dots"), reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
     const url=f=>"media/"+encodeURI(f), poster=f=>"media/"+encodeURI(f.replace(/\.mp4$/i,".jpg"));
-    let i=0, visible=true;
-    v.muted=true; v.loop=list.length===1; if(reduce) v.controls=true;
-    dots.innerHTML=list.length>1?list.map(()=>"<i></i>").join(""):"";
+    let i=0, k=0, visible=true, timer=null;
+    v.muted=true; if(reduce) v.controls=true;
+    dots.innerHTML=items.length>1?items.map(()=>"<i></i>").join(""):"";
+    const next=()=>{ if(items.length>1) show(i+1); };
+    function warm(it){                                                     // подгружаем следующее заранее
+      if(!it||items.length<2) return;
+      if(it.t==="v") fetch(url(it.f)).catch(()=>{}); else pics.forEach(f=>{ new Image().src=url(f); });
+    }
+    function setPhoto(x){ im.style.opacity=0; setTimeout(()=>{ im.src=url(pics[x]); },200); }
+    im.addEventListener("load",()=>{ im.style.opacity=1; });
+    function schedule(){
+      timer=setTimeout(()=>{
+        if(!visible){ schedule(); return; }
+        if(k+1>=pics.length){ show(i+1); } else { k++; setPhoto(k); schedule(); }
+      },2800);
+    }
     function show(n){
-      i=(n+list.length)%list.length;
-      v.poster=poster(list[i]); v.src=url(list[i]); v.muted=true;
-      dots.querySelectorAll("i").forEach((d,k)=>d.classList.toggle("on",k===i));
-      if(!reduce && visible) v.play().catch(()=>{});
-      if(list.length>1) fetch(url(list[(i+1)%list.length])).catch(()=>{});     // подгружаем следующее заранее
+      clearTimeout(timer);
+      i=(n+items.length)%items.length; const it=items[i];
+      dots.querySelectorAll("i").forEach((d,x)=>d.classList.toggle("on",x===i));
+      if(it.t==="v"){
+        im.hidden=true; v.hidden=false; v.loop=items.length===1;
+        v.poster=poster(it.f); v.src=url(it.f); v.muted=true;
+        if(!reduce && visible) v.play().catch(()=>{});
+      } else {
+        v.pause(); v.hidden=true; im.hidden=false; k=0; setPhoto(0);
+        if(!reduce) schedule();
+      }
+      warm(items[(i+1)%items.length]);
     }
     v.addEventListener("loadedmetadata",()=>{ if(v.videoWidth) v.style.aspectRatio=v.videoWidth+"/"+v.videoHeight; });   // рамка под формат ролика
-    v.addEventListener("ended",()=>{ if(list.length>1) show(i+1); });
-    v.addEventListener("click",()=>{ if(list.length>1) show(i+1); });
-    if("IntersectionObserver" in window) new IntersectionObserver(es=>{ visible=es[0].isIntersecting; if(!reduce){ visible?v.play().catch(()=>{}):v.pause(); } }).observe(v);
+    v.addEventListener("ended",next);
+    v.addEventListener("click",next);
+    im.addEventListener("click",next);
+    if("IntersectionObserver" in window) new IntersectionObserver(es=>{
+      visible=es[0].isIntersecting;
+      if(items[i].t==="v" && !reduce){ visible?v.play().catch(()=>{}):v.pause(); }
+    }).observe($("reel"));
     $("reel").hidden=false; show(0);
   })();
 
