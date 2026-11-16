@@ -3,5 +3,5 @@
 window.BOOKING = {
   apiUrl: "https://photo-booking.REPLACE_ME.workers.dev",
   // Фото для бегущей карусели: имена файлов из папки booking/photos/
-  photos: []
+  photos: ["christmas-01.jpg", "christmas-02.jpg", "christmas-03.jpg", "christmas-04.jpg", "christmas-05.jpg"]
 };
