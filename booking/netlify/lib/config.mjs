@@ -16,7 +16,7 @@ export const CONFIG = {
   instagram: "grapeprofoto", // без @
 
   // Для письма клиенту после оплаты
-  contact: { email: "k.yarukova@gmail.com", whatsapp: "33634181505", phone: "+33 6 34 18 15 05" },   // whatsapp — только цифры с кодом страны, например 33612345678
+  contact: { email: "k.yarukova@gmail.com", whatsapp: "33634181505", phone: "" },   // whatsapp — только цифры с кодом страны, например 33612345678
   meetingPoint: { ru: "Под каруселью на Marché de Noël", en: "Under the carousel at the Marché de Noël", fr: "Sous le carrousel du Marché de Noël" },
   guideUrl: "/media/guide.pdf",   // гайд по съёмке (лежит в папке media)
   senderName: "Katherine Grape",
