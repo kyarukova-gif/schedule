@@ -2,7 +2,7 @@
 //   GET  /api/config   -> дни, тарифы, занятые слоты
 //   POST /api/checkout -> держит слот(ы) 30 мин и возвращает ссылку на оплату Stripe
 //   POST /api/webhook  -> Stripe сообщает про оплату/истечение: слот закрывается/освобождается, уходит письмо
-import { CONFIG } from "./config.js";
+import { CONFIG } from "./config.mjs";
 
 const HOLD_SECONDS = 31 * 60;          // Stripe требует, чтобы сессия жила минимум 30 минут
 const SESSION_SECONDS = 30 * 60 + 30;

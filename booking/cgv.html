@@ -155,7 +155,7 @@
   render();
   // подставляем актуальные цены с сервера, если он доступен
   const api=(window.BOOKING&&window.BOOKING.apiUrl||"").replace(/\/$/,"");
-  if(api) fetch(api+"/api/config").then(r=>r.json()).then(c=>{
+  fetch(api+"/api/config").then(r=>r.json()).then(c=>{
     const [a,b]=c.packages||[]; if(!a) return;
     document.querySelectorAll("[data-p]").forEach(el=>{ el.textContent = el.dataset.p==="100"? a.price : (b? b.price : el.textContent); });
     document.querySelectorAll("[data-d]").forEach(el=>el.textContent=a.deposit);

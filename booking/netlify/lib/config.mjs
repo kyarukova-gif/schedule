@@ -15,11 +15,11 @@ export const CONFIG = {
   timezone: "Europe/Paris", // часовой пояс места съёмок
   instagram: "grapeprofoto", // без @
 
-  // Фотодни. date — YYYY-MM-DD, start/end — часы работы (проверь часы для каждого дня).
+  // Фотодни. date — YYYY-MM-DD, start/end — часы работы .
   days: [
-    { date: "2026-12-01", start: "13:00", end: "18:00", place: "Marché de Noël, Nice" },
-    { date: "2026-12-11", start: "13:00", end: "18:00", place: "Marché de Noël, Nice" },
-    { date: "2026-12-19", start: "13:00", end: "18:00", place: "Marché de Noël, Nice" },
-    { date: "2026-12-21", start: "13:00", end: "18:00", place: "Marché de Noël, Nice" }
+    { date: "2026-12-01", start: "12:00", end: "16:00", place: "Marché de Noël, Nice" },
+    { date: "2026-12-11", start: "12:00", end: "16:00", place: "Marché de Noël, Nice" },
+    { date: "2026-12-19", start: "12:00", end: "16:00", place: "Marché de Noël, Nice" },
+    { date: "2026-12-21", start: "12:00", end: "16:00", place: "Marché de Noël, Nice" }
   ]
 };
