@@ -114,11 +114,11 @@ async function handleCheckout(request, env) {
     line_items: [{
       quantity: 1,
       price_data: { currency: "eur", unit_amount: pkg.deposit * 100,
-        product_data: { name: `Arrhes — séance photo ${pkg.minutes} min (Фотосессия ${pkg.minutes} мин) — ${date} ${time}` } }
+        product_data: { name: `Pre-shoot consultation (${pkg.minutes}-min photoshoot ${date} ${time})` } }
     }],
     metadata: meta,
-    custom_text: { submit: { message: `Arrhes non remboursables en cas d'annulation par le client. Pas de droit de rétractation pour une séance à date fixe. CGV : ${site}/cgv.html` } },
-    payment_intent_data: { description: `Фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
+    custom_text: { submit: { message: `Pre-shoot consultation: a separate service starting right after payment; non-refundable once provided; credited against the price of the shoot. No 14-day withdrawal right for a shoot on a fixed date. Terms: ${site}/cgv.html` } },
+    payment_intent_data: { description: `Консультация + бронь: фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
     client_reference_id: `${date}_${time.replace(":", "")}`,
     locale: lang,
     expires_at: Math.floor(Date.now() / 1000) + SESSION_SECONDS,
@@ -159,7 +159,7 @@ async function sendEmail(env, bk) {
     ["Состояние", moods],
     ["МАК-карты", bk.mac_cards === "yes" ? "да" : "нет"],
     ["Пожелания", bk.wishes && bk.wishes !== "-" ? bk.wishes : "—"],
-    ["Стоимость", `${bk.price} € (предоплата ${bk.deposit} € получена, остаток ${bk.price - bk.deposit} € на съёмке)`]
+    ["Стоимость", `${bk.price} € (консультация ${bk.deposit} € оплачена и засчитана, остаток ${bk.price - bk.deposit} € на съёмке)`]
   ];
   const text = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
   const html = `<h2>🎄 Новая запись: ${esc(bk.date)} ${esc(bk.time)}</h2><table cellpadding="6" style="border-collapse:collapse">` +

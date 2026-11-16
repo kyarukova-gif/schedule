@@ -40,13 +40,13 @@ assert.equal((await hook("checkout.session.completed","cs_1","2026-12-12 14:45")
 assert.equal(JSON.parse(store.get("slot:2026-12-12 14:45")).status,"booked");
 assert.equal(mails.length,1);
 const mail = mails[0]; assert.deepEqual(mail.to,["owner@example.com"]); assert.equal(mail.reply_to,"a@b.co");
-for (const s of ["14:45–15:15","Количество человек: 2","@anna.photo","+33 6","красном платье <3","сексуальность".slice(0,0)+"решительность и смелость, лёгкость","МАК-карты: да","20 €"]) assert.ok(mail.text.includes(s), s);
+for (const s of ["14:45–15:15","Количество человек: 2","@anna.photo","+33 6","красном платье <3","сексуальность".slice(0,0)+"решительность и смелость, лёгкость","МАК-карты: да","консультация 20 €"]) assert.ok(mail.text.includes(s), s);
 assert.ok(mail.html.includes("&lt;3"));                      // HTML экранирован
 await hook("checkout.session.completed","cs_1","2026-12-12 14:45"); assert.equal(mails.length,1,"дубль события не шлёт второе письмо");
 
 // --- 60 мин блокирует две ячейки ---
 r = await call("/api/checkout","POST",{...base,time:"13:00",minutes:60,people:6,mac:false,moods:[]}); assert.equal(r.status,200);
-assert.ok(dec(stripeCalls[1]).includes("unit_amount]=2000") && dec(stripeCalls[1]).includes("60 мин"));
+assert.ok(dec(stripeCalls[1]).includes("unit_amount]=2000") && dec(stripeCalls[1]).includes("60-min photoshoot"));
 let t = await taken(); assert.ok(t.includes("2026-12-12 13:00") && t.includes("2026-12-12 13:35"));
 assert.equal((await call("/api/checkout","POST",{...base,time:"13:35"})).status,409,"вторая ячейка часа занята");
 assert.equal((await call("/api/checkout","POST",{...base,time:"14:10"})).status,200,"следующая после часа свободна");

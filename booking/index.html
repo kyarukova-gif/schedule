@@ -86,10 +86,13 @@
   .row{display:flex;justify-content:space-between;gap:12px;padding:5px 0}
   .row.big{font-weight:700;font-size:18px;border-top:1px dashed var(--line);margin-top:6px;padding-top:12px}
   .row .k{color:var(--mute)}
+  .row > span:last-child{white-space:nowrap}
   .sel{font-weight:600;text-align:right}
   .check{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:14px;cursor:pointer}
   .check input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--green)}
   .check.bad{color:var(--red)}
+  .cinfo{font-size:13px;color:var(--mute);margin:12px 0 0}
+  .site{position:absolute;left:14px;top:58px;z-index:2;color:var(--gold);font-size:12px;text-decoration:none}
   .check.mac{margin-top:0;padding:14px 0 2px;font-size:15px}
   .info{display:flex;gap:10px;background:rgba(224,178,90,.14);border:1px solid rgba(224,178,90,.4);color:#f3e7c3;padding:12px 14px;border-radius:14px;font-size:14px;margin-top:12px}
 
@@ -126,6 +129,7 @@
 <header class="hero">
   <canvas id="snow"></canvas>
   <div class="garland" id="garland"></div>
+  <a class="site" href="https://katherinegrape.com" target="_blank" rel="noopener">katherinegrape.com</a>
   <div class="lang" id="lang"></div>
   <div class="eyebrow" data-i="eyebrow"></div>
   <h1>Marché de Noël<small data-i="city"></small></h1>
@@ -187,12 +191,13 @@
       <div class="row"><span class="k" data-i="shoot"></span><span id="sumTotal"></span></div>
       <div class="row"><span class="k" data-i="onsite"></span><span id="sumRest"></span></div>
       <div class="row big"><span data-i="payNow"></span><span id="sumDep"></span></div>
+      <p class="cinfo" data-i="consultInfo"></p>
       <label class="check" id="agreeBox"><input type="checkbox" id="agree"><span data-ih="agree"></span></label>
     </div>
     <div class="info"><span>🎄</span><span data-i="weather"></span></div>
   </section>
 
-  <footer><span data-i="questions"></span> <a id="igLink" target="_blank" rel="noopener"></a><br><a href="cgv.html" data-i="legal"></a></footer>
+  <footer><span data-i="questions"></span> <a id="igLink" target="_blank" rel="noopener"></a><br><a href="https://katherinegrape.com" target="_blank" rel="noopener">katherinegrape.com</a> · <a href="cgv.html" data-i="legal"></a></footer>
 </main>
 
 <div class="bar">
@@ -219,16 +224,16 @@
       moodSub:"Фототерапия — по желанию. Не хочешь — просто попроси красивый новогодний контент 🙂",
       m_relaxed:"Расслабленность",m_sensual:"Сексуальность",m_light:"Лёгкость",m_bold:"Решительность и смелость",m_newyear:"Просто новогодний контент",
       mac:"Хочу мини-работу с МАК-картами",
-      stepYou:"Твои данные",stepPay:"Проверь и оплати предоплату",name:"Имя",insta:"Твой Instagram",phone:"Телефон для связи",
-      when:"Когда",shoot:"Съёмка {min} мин",onsite:"Остаток на месте",payNow:"Платишь сейчас",
-      legal:"Условия и юридическая информация (CGV)",agree:"Понимаю, что предоплата (arrhes) {dep} € остаётся у фотографа, если я откажусь от съёмки, и что 14-дневного права на отказ для съёмки на конкретную дату нет. Остаток {rest} € оплачиваю на съёмке. Принимаю <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">условия (CGV)</a>.",
-      weather:"Съёмка проходит на улице. Если погода сложная — перенесём на другой фотодень, предоплата сохранится.",
+      stepYou:"Твои данные",consultInfo:"Консультация перед съёмкой: до съёмки мы обсуждаем образ, локации, настроение и пожелания в Instagram или по телефону. Её стоимость засчитывается в цену съёмки.",stepPay:"Проверь и оплати консультацию",name:"Имя",insta:"Твой Instagram",phone:"Телефон для связи",
+      when:"Когда",shoot:"Съёмка {min} мин",onsite:"Остаток на месте",payNow:"Консультация (оплата сейчас)",
+      legal:"Условия и юридическая информация (CGV)",agree:"Понимаю, что консультация ({dep} €) — отдельная услуга, которая начинается сразу после оплаты. После её проведения оплата не возвращается, а право на отказ в 14 дней теряется. Для съёмки на конкретную дату права на отказ тоже нет. Стоимость консультации засчитывается в цену съёмки, остаток {rest} € оплачиваю на съёмке. Принимаю <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">условия (CGV)</a>.",
+      weather:"Съёмка проходит на улице. Если погода сложная — перенесём на другой фотодень, оплата консультации сохранится.",
       questions:"Вопросы? Пиши в Instagram",secure:"Оплата через Stripe · Apple Pay и Google Pay",
       btn:"Оплатить {dep} € и забронировать",btnPick:"Выбери день и время",
       pickDay:"Сначала выбери день",left:"свободно {n}",full:"занято",
-      need:"Заполни имя",needAgree:"Подтверди условия предоплаты",needTime:"Выбери время",
+      need:"Заполни имя",needAgree:"Подтверди условия консультации",needTime:"Выбери время",
       errInsta:"Проверь Instagram (например @anna)",errPhone:"Проверь номер телефона",taken:"Это время только что заняли — выбери другое",errNet:"Не получилось, попробуй ещё раз",
-      paidTitle:"Ты записана!",paidText:"Предоплата получена. Я напишу тебе в Instagram или на телефон, чтобы подтвердить детали.",paidClose:"Закрыть",
+      paidTitle:"Ты записана!",paidText:"Консультация оплачена, время за тобой. Я напишу тебе в Instagram или на телефон, чтобы обсудить образ и детали.",paidClose:"Закрыть",
       min:"мин",wd:["вс","пн","вт","ср","чт","пт","сб"],mo:["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"],
       moFull:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]},
     en:{eyebrow:"Express photoshoots",city:"Nice",sub:"Thirty minutes at the Christmas market — warm photos and the state you want to take into the new year",
@@ -239,16 +244,16 @@
       moodSub:"The phototherapy twist is optional. Not into it? Just ask for pretty New Year content 🙂",
       m_relaxed:"Relaxed",m_sensual:"Sensual",m_light:"Light",m_bold:"Decisive & bold",m_newyear:"Just New Year content",
       mac:"I'd like a mini session with MAC cards",
-      stepYou:"Your details",stepPay:"Review & pay the deposit",name:"Name",insta:"Your Instagram",phone:"Phone number",
-      when:"When",shoot:"{min}-min session",onsite:"Balance on site",payNow:"Pay now",
-      legal:"Terms & legal notice (CGV)",agree:"I understand the {dep} € deposit (arrhes) is forfeited if I cancel, and that there is no 14-day right of withdrawal for a shoot on a specific date. I'll pay the {rest} € balance at the shoot. I accept the <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">terms (CGV)</a>.",
-      weather:"The shoot is outdoors. If the weather is bad, we'll move you to another photo day — your deposit carries over.",
+      stepYou:"Your details",consultInfo:"Pre-shoot consultation: before the shoot we discuss the look, locations, mood and wishes on Instagram or by phone. Its price is credited against the price of the shoot.",stepPay:"Review & pay for the consultation",name:"Name",insta:"Your Instagram",phone:"Phone number",
+      when:"When",shoot:"{min}-min session",onsite:"Balance on site",payNow:"Consultation (pay now)",
+      legal:"Terms & legal notice (CGV)",agree:"I understand the consultation ({dep} €) is a separate service that starts right after payment. Once it has been provided, the payment is non-refundable and my 14-day right of withdrawal for it is lost. There is also no withdrawal right for a shoot on a fixed date. Its price is credited against the shoot price; I'll pay the remaining {rest} € at the shoot. I accept the <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">terms (CGV)</a>.",
+      weather:"The shoot is outdoors. If the weather is bad, we'll move you to another photo day — your consultation payment carries over.",
       questions:"Questions? DM on Instagram",secure:"Secure payment via Stripe · Apple Pay & Google Pay",
       btn:"Pay {dep} € & book",btnPick:"Pick a day and time",
       pickDay:"Pick a day first",left:"{n} left",full:"full",
-      need:"Please enter your name",needAgree:"Please accept the deposit terms",needTime:"Pick a time",
+      need:"Please enter your name",needAgree:"Please accept the consultation terms",needTime:"Pick a time",
       errInsta:"Check your Instagram (e.g. @anna)",errPhone:"Check your phone number",taken:"That time was just taken — pick another",errNet:"Something went wrong, please try again",
-      paidTitle:"You're booked!",paidText:"Deposit received. I'll message you on Instagram or by phone to confirm the details.",paidClose:"Close",
+      paidTitle:"You're booked!",paidText:"Consultation paid, your time is booked. I'll message you on Instagram or by phone to discuss the look and details.",paidClose:"Close",
       min:"min",wd:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mo:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
       moFull:["January","February","March","April","May","June","July","August","September","October","November","December"]},
     fr:{eyebrow:"Shootings express",city:"Nice",sub:"Trente minutes au marché de Noël — de belles photos et l'état d'esprit avec lequel entrer dans la nouvelle année",
@@ -259,16 +264,16 @@
       moodSub:"La touche « phototherapie » est facultative. Pas envie ? Demande simplement de jolies photos du Nouvel An 🙂",
       m_relaxed:"Détente",m_sensual:"Sensualité",m_light:"Légèreté",m_bold:"Détermination et audace",m_newyear:"Juste des photos du Nouvel An",
       mac:"Je veux une mini-séance avec les cartes MAC",
-      stepYou:"Tes coordonnées",stepPay:"Vérifie et paie l'acompte",name:"Prénom",insta:"Ton Instagram",phone:"Téléphone",
-      when:"Quand",shoot:"Shooting {min} min",onsite:"Reste sur place",payNow:"À payer maintenant",
-      legal:"CGV et mentions légales",agree:"Je comprends que les arrhes de {dep} € sont perdues si j'annule, et qu'il n'y a pas de droit de rétractation de 14 jours pour une séance à date fixe. Je paie les {rest} € restants sur place. J'accepte les <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">CGV</a>.",
-      weather:"Le shooting a lieu en extérieur. Si la météo est mauvaise, on te reporte à un autre jour — l'acompte reste valable.",
+      stepYou:"Tes coordonnées",consultInfo:"Consultation préalable : avant la séance, on échange sur le style, les lieux, l'ambiance et tes souhaits sur Instagram ou par téléphone. Son prix est déduit du prix de la séance.",stepPay:"Vérifie et paie la consultation",name:"Prénom",insta:"Ton Instagram",phone:"Téléphone",
+      when:"Quand",shoot:"Shooting {min} min",onsite:"Reste sur place",payNow:"Consultation (à payer maintenant)",
+      legal:"CGV et mentions légales",agree:"Je comprends que la consultation ({dep} €) est une prestation distincte qui commence dès le paiement. Une fois réalisée, elle n'est plus remboursable et je perds mon droit de rétractation de 14 jours à son égard. Il n'y a pas non plus de droit de rétractation pour une séance à date fixe. Son prix est déduit du prix de la séance ; je paie les {rest} € restants sur place. J'accepte les <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">CGV</a>.",
+      weather:"Le shooting a lieu en extérieur. Si la météo est mauvaise, on te reporte à un autre jour — le paiement de la consultation reste valable.",
       questions:"Des questions ? Écris-moi sur Instagram",secure:"Paiement sécurisé via Stripe · Apple Pay et Google Pay",
       btn:"Payer {dep} € et réserver",btnPick:"Choisis un jour et une heure",
       pickDay:"Choisis d'abord un jour",left:"{n} libres",full:"complet",
-      need:"Indique ton prénom",needAgree:"Confirme les conditions de l'acompte",needTime:"Choisis une heure",
+      need:"Indique ton prénom",needAgree:"Confirme les conditions de la consultation",needTime:"Choisis une heure",
       errInsta:"Vérifie ton Instagram (ex. @anna)",errPhone:"Vérifie ton numéro de téléphone",taken:"Ce créneau vient d'être pris — choisis-en un autre",errNet:"Une erreur est survenue, réessaie",
-      paidTitle:"C'est réservé !",paidText:"Acompte reçu. Je t'écris sur Instagram ou par téléphone pour confirmer les détails.",paidClose:"Fermer",
+      paidTitle:"C'est réservé !",paidText:"Consultation payée, ton créneau est réservé. Je t'écris sur Instagram ou par téléphone pour parler du style et des détails.",paidClose:"Fermer",
       min:"min",wd:["dim","lun","mar","mer","jeu","ven","sam"],mo:["janv","févr","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"],
       moFull:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]}
   };
