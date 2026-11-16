@@ -217,7 +217,7 @@
   const T = {
     ru:{eyebrow:"Экспресс-фотосессии",city:"Ницца",sub:"Полчаса на рождественском рынке — тёплые кадры на память",
       pillPhotos:"до 100 фото за 30 мин",
-      inc1:"30 или 60 минут съёмки",inc2:"До 100 фотографий за 30 минут во всех основных локациях рынка",inc3:"Обработка за 2 рабочих дня",inc4:"Мини-работа с МАК-картами — по желанию",
+      inc1:"30 или 60 минут съёмки",inc2:"До 100 фотографий за 30 минут во всех основных локациях рынка",inc3:"Ретушь кожи и цветокоррекция, готово за 2 рабочих дня",
       
       otherDay:"Если эти даты вам не подходят, напишите мне в личку в Instagram {ig} — возможно, найдём другой день.",stepWho:"Сколько вас и на сколько?",people:"Количество человек",pkgDesc0:"1–3 человека",pkgDesc1:"компании и большие семьи",tip:"Вас {n} — для такой компании лучше взять час, чтобы все успели.",tipBtn:"Выбрать час",wishes:"Пожелания к съёмке (необязательно)",wishesPh:"Образы, локации, что-то важное…",stepDay:"Выберите день",stepTime:"Выберите время",
       
@@ -237,7 +237,7 @@
       moFull:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]},
     en:{eyebrow:"Express photoshoots",city:"Nice",sub:"Thirty minutes at the Christmas market — warm photos to keep",
       pillPhotos:"up to 100 photos / 30 min",
-      inc1:"30 or 60-minute session",inc2:"Up to 100 photos in 30 minutes across all the main spots of the market",inc3:"Edited within 2 working days",inc4:"Mini session with MAC cards — optional",
+      inc1:"30 or 60-minute session",inc2:"Up to 100 photos in 30 minutes across all the main spots of the market",inc3:"Skin retouching and color correction, ready in 2 working days",
       
       otherDay:"If none of these dates work for you, DM me on Instagram {ig} — maybe we can find another day.",stepWho:"How many of you, and for how long?",people:"Number of people",pkgDesc0:"1–3 people",pkgDesc1:"groups & big families",tip:"There are {n} of you — for a group like that, an hour is better so everyone is covered.",tipBtn:"Choose 1 hour",wishes:"Wishes for the shoot (optional)",wishesPh:"Looks, locations, anything important…",stepDay:"Pick a day",stepTime:"Pick a time",
       
@@ -257,7 +257,7 @@
       moFull:["January","February","March","April","May","June","July","August","September","October","November","December"]},
     fr:{eyebrow:"Shootings express",city:"Nice",sub:"Trente minutes au marché de Noël — de belles photos à garder",
       pillPhotos:"jusqu'à 100 photos / 30 min",
-      inc1:"30 ou 60 minutes de shooting",inc2:"Jusqu'à 100 photos en 30 minutes dans tous les lieux principaux du marché",inc3:"Retouches sous 2 jours ouvrés",inc4:"Mini-séance avec les cartes MAC — en option",
+      inc1:"30 ou 60 minutes de shooting",inc2:"Jusqu'à 100 photos en 30 minutes dans tous les lieux principaux du marché",inc3:"Retouche de la peau et colorimétrie, livraison sous 2 jours ouvrés",
       
       otherDay:"Si ces dates ne vous conviennent pas, écrivez-moi en message privé sur Instagram {ig} — on trouvera peut-être un autre jour.",stepWho:"Combien êtes-vous, et pour combien de temps ?",people:"Nombre de personnes",pkgDesc0:"1 à 3 personnes",pkgDesc1:"groupes et grandes familles",tip:"Vous êtes {n} — pour un groupe comme le vôtre, une heure vaut mieux pour que tout le monde passe.",tipBtn:"Choisir 1 heure",wishes:"Souhaits pour le shooting (facultatif)",wishesPh:"Looks, lieux, tout ce qui compte…",stepDay:"Choisissez un jour",stepTime:"Choisissez l'heure",
       
@@ -315,7 +315,7 @@
     $("pillDur").textContent = "⏱ "+C.packages.map(p=>p.minutes).join(" / ")+" "+T[lang].min;
     $("pillPrice").textContent = C.packages[0].price ? "💶 "+C.packages.map(p=>p.price).join(" / ")+" €" : "";
     document.querySelectorAll("[data-ph]").forEach(el=>el.placeholder=t(el.dataset.ph));
-    $("inc").innerHTML = [["⏱","inc1"],["📷","inc2"],["✨","inc3"],["🃏","inc4"]].map(([i,k])=>`<li><span class="ic">${i}</span><span>${t(k)}</span></li>`).join("");
+    $("inc").innerHTML = [["⏱","inc1"],["📷","inc2"],["✨","inc3"]].map(([i,k])=>`<li><span class="ic">${i}</span><span>${t(k)}</span></li>`).join("");
     const ig=$("igLink"); ig.textContent=C.instagram?"@"+C.instagram:""; ig.href="https://instagram.com/"+C.instagram;
   }
   function renderDays(){
