@@ -169,14 +169,16 @@ export function buildClientMail(rec, { config, siteUrl }) {
   <div>${contactBtns}</div>
   ${contact.phone ? `<div style="margin-top:8px;font:14px ${font};color:${C.ink}">${esc(t.phone)}: ${esc(contact.phone)}</div>` : ""}
 </td></tr>
-<tr><td align="center" style="padding:16px 10px;font:12px ${font};color:#f1e3bd;opacity:.85">${esc(t.footer)}</td></tr>
+<tr><td align="center" style="padding:16px 10px;font:13px/1.6 ${font};color:#f1e3bd">
+  ${config.website ? `<a href="${esc(config.website)}" style="color:#f3e7c3;text-decoration:underline">${esc(t.footer)}</a><br><a href="${esc(config.website)}" style="color:${C.gold};text-decoration:none">${esc(config.website.replace(/^https?:\/\//, ""))}</a>` : esc(t.footer)}
+</td></tr>
 </table></td></tr></table></body></html>`;
 
   const text = [t.title, "", fmt(t.hello, v), "", `${t.when}: ${whenLong}`, `${t.dur}: ${rec.minutes} ${t.min}`, `${t.people}: ${rec.people}`, `${t.place}: ${place}`,
     meeting ? `${t.meet}: ${meeting}` : "", "", `${t.cal}: ${gcal}`, "", t.termsTitle + ":", "", t.photosTitle + ":", "- " + t.ph1, "- " + t.ph2, "", t.payTitle + ":", "- " + fmt(t.pay1, v), "- " + fmt(t.pay2, v),
     "", t.weatherTitle + ":", "- " + t.w1, "- " + t.w2, "",
     `${t.terms}: ${site}/cgv.html`, guide ? `${t.guide}: ${guide}` : "", "", t.contactTitle + ":", `Instagram: https://instagram.com/${ig}`, config.instagramPortfolio ? `${t.port}: https://instagram.com/${config.instagramPortfolio}` : "",
-    contact.email ? `${t.mail}: ${contact.email}` : "", waDigits ? `WhatsApp: https://wa.me/${waDigits}` : ""].filter(x => x !== "").join("\n");
+    contact.email ? `${t.mail}: ${contact.email}` : "", waDigits ? `WhatsApp: https://wa.me/${waDigits}` : "", config.website ? `${t.footer}: ${config.website}` : ""].filter(x => x !== "").join("\n");
 
   return { to: rec.email, subject: fmt(t.subject, v), html, text, ics, gcal };
 }

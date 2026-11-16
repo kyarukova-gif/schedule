@@ -7,7 +7,7 @@ import { buildClientMail } from "./mail.mjs";
 
 // Версия письма клиенту. Если число увеличить, письмо будет отправлено повторно для существующих броней.
 // Меняй ТОЛЬКО до запуска (пока в списке нет настоящих клиентов).
-const CLIENT_MAIL_VERSION = 2;
+const CLIENT_MAIL_VERSION = 3;
 const HOLD_SECONDS = 31 * 60;          // Stripe требует, чтобы сессия жила минимум 30 минут
 const SESSION_SECONDS = 30 * 60 + 30;
 
