@@ -114,7 +114,7 @@ async function handleCheckout(request, env) {
         product_data: { name: `Booking deposit — ${pkg.minutes}-min photoshoot ${date} ${time}` } }
     }],
     metadata: meta,
-    custom_text: { submit: { message: `Booking deposit (arrhes): reserves your time slot and is credited against the price of the shoot. Non-refundable if you cancel. No 14-day withdrawal right for a shoot on a fixed date. Terms: ${site}/cgv.html` } },
+    custom_text: { submit: { message: `Booking deposit (arrhes): reserves your time slot and is credited against the price of the shoot. Non-refundable if you cancel. No 14-day withdrawal right for a shoot on a fixed date (art. L221-28, 12° French Consumer Code). Terms: ${site}/cgv.html` } },
     payment_intent_data: { description: `Предоплата за бронь: фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
     client_reference_id: `${date}_${time.replace(":", "")}`,
     locale: lang,
