@@ -233,7 +233,7 @@
       pickDay:"Сначала выберите день",left:"свободно {n}",full:"занято",
       need:"Укажите имя",needAgree:"Подтвердите условия предоплаты",needTime:"Выберите время",
       errInsta:"Проверьте Instagram (например @anna)",errPhone:"Проверьте номер телефона",taken:"Это время только что заняли — выберите другое",errNet:"Не получилось, попробуйте ещё раз",
-      paidTitle:"Вы записаны!",paidText:"Предоплата получена, время за вами. Я напишу вам в Instagram или на телефон, чтобы подтвердить детали.",paidClose:"Закрыть",
+      paidTitle:"Вы записаны!",paidText:"Предоплата получена, время за вами. Я напишу вам в Instagram или на телефон, чтобы подтвердить детали.",paidClose:"Закрыть",guide:"Гайд по съёмке",
       min:"мин",wd:["вс","пн","вт","ср","чт","пт","сб"],mo:["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"],
       moFull:["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"]},
     en:{eyebrow:"Express photoshoots",city:"Nice",sub:"Thirty minutes at the Christmas market — warm photos to keep",
@@ -253,7 +253,7 @@
       pickDay:"Pick a day first",left:"{n} left",full:"full",
       need:"Please enter your name",needAgree:"Please accept the deposit terms",needTime:"Pick a time",
       errInsta:"Check your Instagram (e.g. @anna)",errPhone:"Check your phone number",taken:"That time was just taken — pick another",errNet:"Something went wrong, please try again",
-      paidTitle:"You're booked!",paidText:"Deposit received, your time is booked. I'll message you on Instagram or by phone to confirm the details.",paidClose:"Close",
+      paidTitle:"You're booked!",paidText:"Deposit received, your time is booked. I'll message you on Instagram or by phone to confirm the details.",paidClose:"Close",guide:"Shoot guide",
       min:"min",wd:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mo:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
       moFull:["January","February","March","April","May","June","July","August","September","October","November","December"]},
     fr:{eyebrow:"Shootings express",city:"Nice",sub:"Trente minutes au marché de Noël — de belles photos à garder",
@@ -273,7 +273,7 @@
       pickDay:"Choisissez d'abord un jour",left:"{n} libres",full:"complet",
       need:"Indiquez votre prénom",needAgree:"Confirmez les conditions des arrhes",needTime:"Choisissez une heure",
       errInsta:"Vérifiez votre Instagram (ex. @anna)",errPhone:"Vérifiez votre numéro de téléphone",taken:"Ce créneau vient d'être pris — choisissez-en un autre",errNet:"Une erreur est survenue, réessayez",
-      paidTitle:"C'est réservé !",paidText:"Arrhes reçues, votre créneau est réservé. Je vous écris sur Instagram ou par téléphone pour confirmer les détails.",paidClose:"Fermer",
+      paidTitle:"C'est réservé !",paidText:"Arrhes reçues, votre créneau est réservé. Je vous écris sur Instagram ou par téléphone pour confirmer les détails.",paidClose:"Fermer",guide:"Guide de la séance",
       min:"min",wd:["dim","lun","mar","mer","jeu","ven","sam"],mo:["janv","févr","mars","avr","mai","juin","juil","août","sept","oct","nov","déc"],
       moFull:["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"]}
   };
@@ -422,9 +422,10 @@
     const slot=(q.get("slot")||"").replace(/[<>&"']/g,"");
     ov.innerHTML=`<div><div style="font-size:56px">🎄</div><h1 class="serif" style="font-style:italic;font-size:30px;margin:10px 0" id="pt"></h1>
       <p style="font-weight:600;margin:0 0 8px;color:var(--gold)">${slot}</p><p style="opacity:.85;max-width:340px;margin:0 auto 20px" id="pp"></p>
-      <button class="btn" style="position:static" id="pc"></button></div>`;
+      <a class="btn" style="position:static;text-align:center;text-decoration:none;margin-bottom:10px" id="pg" href="media/guide.pdf" target="_blank" rel="noopener"></a>
+      <button class="btn" style="position:static;background:transparent;border:2px solid rgba(224,178,90,.55);box-shadow:none" id="pc"></button></div>`;
     document.body.appendChild(ov);
-    $("pt").textContent=t("paidTitle"); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose");
+    $("pt").textContent=t("paidTitle"); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose"); $("pg").textContent=t("guide");
     $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
   }
 

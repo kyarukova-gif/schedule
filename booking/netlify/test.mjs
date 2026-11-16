@@ -8,7 +8,8 @@ const KV = {
   async put(k,v){ store.set(k,v); }, async delete(k){ store.delete(k); },
   async list({prefix}){ return {keys:[...store.keys()].filter(k=>k.startsWith(prefix)).map(name=>({name})), list_complete:true}; }
 };
-const env = { SLOTS:KV, STRIPE_SECRET_KEY:"sk_test", STRIPE_WEBHOOK_SECRET:"whsec_x", SITE_URL:"https://x.io/booking",
+const clientMails=[]; let clientFail=false;
+const env = { sendClientMail: async m => { if (clientFail) throw new Error("smtp down"); clientMails.push(m); }, SLOTS:KV, STRIPE_SECRET_KEY:"sk_test", STRIPE_WEBHOOK_SECRET:"whsec_x", SITE_URL:"https://x.io/booking",
               RESEND_API_KEY:"re_x", NOTIFY_EMAIL:"owner@example.com" };
 const stripeCalls=[], mails=[]; let mailFail=false, n=0;
 globalThis.fetch = async (url, opt) => {
@@ -40,10 +41,12 @@ assert.equal((await call("/api/webhook","POST","{}",{"stripe-signature":"t=1,v1=
 assert.equal((await hook("checkout.session.completed","cs_1","2026-12-11 13:45")).status,200);
 assert.equal(JSON.parse(store.get("slot:2026-12-11 13:45")).status,"booked");
 assert.equal(mails.length,1);
+assert.equal(clientMails.length,1,"клиент получил письмо");
+assert.equal(clientMails[0].to,"a@b.co"); assert.ok(clientMails[0].subject.startsWith("Вы записаны"),clientMails[0].subject); assert.ok(clientMails[0].ics.includes("BEGIN:VEVENT"));
 const mail = mails[0]; assert.deepEqual(mail.to,["owner@example.com"]); assert.equal(mail.reply_to,"a@b.co");
 for (const s of ["13:45–14:15","Количество человек: 2","@anna.photo","+33 6","красном платье <3","предоплата 20 €"]) assert.ok(mail.text.includes(s), s);
 assert.ok(mail.html.includes("&lt;3"));                      // HTML экранирован
-await hook("checkout.session.completed","cs_1","2026-12-11 13:45"); assert.equal(mails.length,1,"дубль события не шлёт второе письмо");
+await hook("checkout.session.completed","cs_1","2026-12-11 13:45"); assert.equal(mails.length,1,"дубль события не шлёт второе письмо"); assert.equal(clientMails.length,1,"и клиенту повторно не шлёт");
 
 // --- 60 мин блокирует две ячейки ---
 r = await call("/api/checkout","POST",{...base,time:"12:00",minutes:60,people:6}); assert.equal(r.status,200);
@@ -62,7 +65,14 @@ assert.ok(t.includes("2026-12-11 13:45"),"оплаченная бронь не �
 // --- сбой почты: Stripe повторит, письмо уйдёт ---
 mailFail=true; assert.equal((await hook("checkout.session.completed","cs_9","2026-12-19 12:00")).status,500);
 assert.equal(JSON.parse(store.get("slot:2026-12-19 12:00")).status,"booked","слот закрыт, даже если письмо не ушло");
-mailFail=false; assert.equal((await hook("checkout.session.completed","cs_9","2026-12-19 12:00")).status,200); assert.equal(mails.length,2);
+mailFail=false; assert.equal((await hook("checkout.session.completed","cs_9","2026-12-19 12:00")).status,200); assert.equal(mails.length,2); assert.equal(clientMails.length,2,"после сбоя письмо клиенту ушло");
+// --- сбой отправки клиенту: бронь сохранена, Stripe повторит, письмо фотографу второй раз не уходит ---
+clientFail=true; const before=mails.length, cBefore=clientMails.length;
+assert.equal((await hook("checkout.session.completed","cs_20","2026-12-21 14:20")).status,500);
+assert.equal(JSON.parse(store.get("slot:2026-12-21 14:20")).status,"booked");
+assert.equal(mails.length,before+1,"фотографу письмо ушло"); assert.equal(clientMails.length,cBefore);
+clientFail=false; assert.equal((await hook("checkout.session.completed","cs_20","2026-12-21 14:20")).status,200);
+assert.equal(mails.length,before+1,"фотографу второй раз не шлём"); assert.equal(clientMails.length,cBefore+1,"клиенту после повтора ушло");
 console.log("ALL OK");
 
 // --- обёртка Netlify Blobs: срок жизни и список ---

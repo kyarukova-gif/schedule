@@ -1,6 +1,8 @@
 // Netlify Function: все запросы /api/* (расписание, оплата, вебхук Stripe)
 import { getStore } from "@netlify/blobs";
+import nodemailer from "nodemailer";
 import worker from "../lib/core.mjs";
+import { CONFIG } from "../lib/config.mjs";
 import { kvFromBlobs } from "../lib/kv.mjs";
 
 const get = k => globalThis.Netlify?.env?.get(k) ?? process.env[k];
@@ -15,6 +17,17 @@ export default async (request) => {
     MAIL_FROM: get("MAIL_FROM"),
     SITE_URL: get("URL")            // адрес сайта Netlify подставляет сам
   };
+  // Письмо клиенту отправляется с Gmail-адреса фотографа (пароль приложения Google)
+  const gUser = get("GMAIL_USER"), gPass = (get("GMAIL_APP_PASSWORD") || "").replace(/\s/g, "");
+  if (gUser && gPass) {
+    env.sendClientMail = async m => {
+      const tr = nodemailer.createTransport({ service: "gmail", auth: { user: gUser, pass: gPass } });
+      await tr.sendMail({
+        from: `"${CONFIG.senderName}" <${gUser}>`, to: m.to, replyTo: gUser, subject: m.subject, text: m.text, html: m.html,
+        attachments: [{ filename: "photoshoot.ics", content: m.ics, contentType: "text/calendar; charset=utf-8; method=PUBLISH" }]
+      });
+    };
+  }
   return worker.fetch(request, env);
 };
 

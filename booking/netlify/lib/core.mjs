@@ -3,6 +3,7 @@
 //   POST /api/checkout -> держит слот(ы) 30 мин и возвращает ссылку на оплату Stripe
 //   POST /api/webhook  -> Stripe сообщает про оплату/истечение: слот закрывается/освобождается, уходит письмо
 import { CONFIG } from "./config.mjs";
+import { buildClientMail } from "./mail.mjs";
 
 const HOLD_SECONDS = 31 * 60;          // Stripe требует, чтобы сессия жила минимум 30 минут
 const SESSION_SECONDS = 30 * 60 + 30;
@@ -103,7 +104,7 @@ async function handleCheckout(request, env) {
   for (const k of keys) await env.SLOTS.put(k, hold(undefined), { expirationTtl: HOLD_SECONDS });
 
   const meta = {
-    slot: `${date} ${time}`, minutes: pkg.minutes, people, price: pkg.price, deposit: pkg.deposit,
+    slot: `${date} ${time}`, lang: lang === "auto" ? "ru" : lang, minutes: pkg.minutes, people, price: pkg.price, deposit: pkg.deposit,
     name, instagram: "@" + instagram, phone, wishes: wishes || "-"
   };
   const site = (env.SITE_URL || "").replace(/\/$/, "");
@@ -202,19 +203,28 @@ async function handleWebhook(request, env) {
   if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
     if (s.payment_status === "paid") {
       const main = await env.SLOTS.get(keys[0], "json");
-      if (main && main.status === "booked" && main.session === s.id && main.emailed) return new Response("ok"); // повтор события
-      const record = {
-        status: "booked", session: s.id, date, time, minutes, people: Number(m.people) || 1,
+      const same = main && main.status === "booked" && main.session === s.id;
+      const wantClient = typeof env.sendClientMail === "function";
+      if (same && main.emailed && (main.clientEmailed || !wantClient)) return new Response("ok"); // повтор события
+      const record = same ? main : {
+        status: "booked", session: s.id, date, time, minutes, lang: m.lang || "ru", people: Number(m.people) || 1,
         price: Number(m.price), deposit: Number(m.deposit), name: m.name, instagram: m.instagram, phone: m.phone,
         wishes: m.wishes, email: s.customer_details && s.customer_details.email,
-        emailed: false, at: Date.now()
+        emailed: false, clientEmailed: false, at: Date.now()
       };
-      // Закрываем все ячейки навсегда
-      for (const [i, k] of keys.entries()) await env.SLOTS.put(k, JSON.stringify(i === 0 ? record : { status: "booked", session: s.id, part: true }));
+      if (!same) // Закрываем все ячейки навсегда
+        for (const [i, k2] of keys.entries()) await env.SLOTS.put(k2, JSON.stringify(i === 0 ? record : { status: "booked", session: s.id, part: true }));
       try {
-        await sendEmail(env, record);
-        record.emailed = true;
-        await env.SLOTS.put(keys[0], JSON.stringify(record));
+        if (!record.emailed) {                                  // письмо фотографу
+          await sendEmail(env, record);
+          record.emailed = true;
+          await env.SLOTS.put(keys[0], JSON.stringify(record));
+        }
+        if (wantClient && record.email && !record.clientEmailed) {   // письмо клиенту
+          await env.sendClientMail(buildClientMail(record, { config: CONFIG, siteUrl: env.SITE_URL }));
+          record.clientEmailed = true;
+          await env.SLOTS.put(keys[0], JSON.stringify(record));
+        }
       } catch (e) {
         console.error("email failed", e);
         return new Response("email failed", { status: 500 }); // Stripe повторит; бронь уже сохранена
