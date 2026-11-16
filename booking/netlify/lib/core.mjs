@@ -90,6 +90,8 @@ async function handleCheckout(request, env) {
   if (!name) return json(env, { error: "bad_name" }, 400);
   if (!instagram) return json(env, { error: "bad_instagram" }, 400);
   if (!phone) return json(env, { error: "bad_phone" }, 400);
+  const email = String(b.email || "").trim().slice(0, 120);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json(env, { error: "bad_email" }, 400);
   if (!Number.isInteger(people) || people < 1 || people > CONFIG.maxPeople) return json(env, { error: "bad_people" }, 400);
   const wishes = String(b.wishes || "").trim().slice(0, 400);
   const lang = ["ru", "en", "fr"].includes(b.lang) ? b.lang : "auto";
@@ -117,6 +119,7 @@ async function handleCheckout(request, env) {
     custom_text: { submit: { message: `Booking deposit (arrhes): reserves your time slot and is credited against the price of the shoot. Non-refundable if you cancel. No 14-day withdrawal right for a shoot on a fixed date (art. L221-28, 12° French Consumer Code). Terms: ${site}/cgv.html` } },
     payment_intent_data: { description: `Предоплата за бронь: фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
     client_reference_id: `${date}_${time.replace(":", "")}`,
+    customer_email: email,   // почта клиента подставляется в Stripe и получит чек
     locale: lang,
     expires_at: Math.floor(Date.now() / 1000) + SESSION_SECONDS,
     success_url: `${site}/?paid=1&slot=${encodeURIComponent(`${date} ${time}`)}`,

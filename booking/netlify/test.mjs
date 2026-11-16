@@ -17,7 +17,7 @@ globalThis.fetch = async (url, opt) => {
   return new Response(JSON.stringify({id:"cs_"+(++n),url:"https://checkout.stripe.com/c/"+n}),{status:200});
 };
 const call = (path, method, body, headers={}) => worker.fetch(new Request("https://w.dev"+path,{method,body:body&&(typeof body==="string"?body:JSON.stringify(body)),headers}),env);
-const base = {date:"2026-12-11",time:"13:45",minutes:30,people:2,name:"Anna",instagram:"@anna.photo",phone:"+33 6 12 34 56 78",lang:"fr",wishes:"Хочу в красном платье <3"};
+const base = {date:"2026-12-11",time:"13:45",minutes:30,people:2,name:"Anna",instagram:"@anna.photo",phone:"+33 6 12 34 56 78",email:"client@example.com",lang:"fr",wishes:"Хочу в красном платье <3"};
 const taken = async () => (await (await call("/api/config","GET")).json()).taken;
 const sign = raw => { const t=Math.floor(Date.now()/1000); return {"stripe-signature":`t=${t},v1=${createHmac("sha256","whsec_x").update(`${t}.${raw}`).digest("hex")}`}; };
 const hook = (type, id, slot, extra={}) => { const raw=JSON.stringify({type,data:{object:{id,payment_status:"paid",customer_details:{email:"a@b.co"},
@@ -25,7 +25,7 @@ const hook = (type, id, slot, extra={}) => { const raw=JSON.stringify({type,data
   return call("/api/webhook","POST",raw,sign(raw)); };
 
 // --- валидация ---
-for (const [patch, why] of [[{instagram:""},"insta"],[{phone:"abc"},"phone"],[{time:"14:30"},"не по сетке"],[{date:"2026-12-25"},"дата"],
+for (const [patch, why] of [[{instagram:""},"insta"],[{phone:"abc"},"phone"],[{email:"nope"},"email"],[{email:""},"email пустой"],[{time:"14:30"},"не по сетке"],[{date:"2026-12-25"},"дата"],
   [{people:0},"people 0"],[{people:99},"people 99"],[{minutes:45},"пакет"],[{minutes:60,time:"15:30"},"час не влезает"]])
   assert.equal((await call("/api/checkout","POST",{...base,...patch})).status,400,why);
 
@@ -33,6 +33,7 @@ for (const [patch, why] of [[{instagram:""},"insta"],[{phone:"abc"},"phone"],[{t
 let r = await call("/api/checkout","POST",base); assert.equal(r.status,200);
 const dec = s => decodeURIComponent(s.replace(/\+/g," ")); const f = dec(stripeCalls[0]);
 assert.ok(f.includes("unit_amount]=2000") && f.includes("[people]=2") && f.includes("locale=fr") && f.includes("Хочу в красном"));
+assert.ok(f.includes("customer_email=client@example.com")||f.includes("customer_email=client%40example.com"),"почта клиента уходит в Stripe");
 assert.equal(mails.length,0);
 assert.equal((await call("/api/checkout","POST",{...base,name:"Bob"})).status,409);
 assert.equal((await call("/api/webhook","POST","{}",{"stripe-signature":"t=1,v1=bad"})).status,400);
