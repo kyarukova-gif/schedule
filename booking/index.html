@@ -117,14 +117,13 @@
   .field textarea{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:14px;border:2px solid transparent;background:var(--cream);color:var(--ink);resize:vertical;min-height:84px}
   .field textarea:focus{outline:none;border-color:var(--gold)}
   [hidden]{display:none !important}
-  .gallery{overflow:hidden;padding:14px 0 2px;background:linear-gradient(180deg,var(--night2),var(--night))}
-  .gallery[hidden]{display:none}
-  .track{display:flex;gap:10px;width:max-content;animation:slide var(--dur,40s) linear infinite}
-  .track img{height:230px;width:auto;border-radius:14px;display:block;border:2px solid rgba(224,178,90,.55);background:#10281f}
-  .track video{height:230px;width:auto;aspect-ratio:4/5;object-fit:cover;border-radius:14px;display:block;border:2px solid rgba(224,178,90,.55);background:#10281f}
-  .gallery:active .track{animation-play-state:paused}
-  @keyframes slide{to{transform:translateX(calc(-50% - 5px))}}
-  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} .gallery{overflow-x:auto} .track{animation:none} }
+  .reel{padding:18px 0 4px;background:linear-gradient(180deg,var(--night2),var(--night));display:flex;flex-direction:column;align-items:center;gap:10px}
+  .reel[hidden]{display:none}
+  .reel video{width:min(270px,70vw);aspect-ratio:4/5;object-fit:cover;border-radius:16px;display:block;border:2px solid rgba(224,178,90,.55);background:#10281f;cursor:pointer}
+  .dots{display:flex;gap:6px}
+  .dots i{width:7px;height:7px;border-radius:50%;background:rgba(251,244,226,.3)}
+  .dots i.on{background:var(--gold)}
+  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} }
 </style>
 </head>
 <body>
@@ -144,7 +143,7 @@
   </div>
 </header>
 
-<div class="gallery" id="gallery" hidden aria-label="Photos"><div class="track" id="track"></div></div>
+<div class="reel" id="reel" hidden><video id="reelv" muted playsinline preload="auto" aria-hidden="true"></video><div class="dots" id="dots"></div></div>
 
 <main class="wrap">
   <section>
@@ -424,17 +423,25 @@
     $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
   }
 
-  // ---------- карусель фотографий (список в config.js → photos) ----------
-  (function carousel(){
-    const list=(window.BOOKING.photos||[]).filter(Boolean); if(!list.length) return;
-    const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const html=list.map(f=>/\.mp4$/i.test(f)
-      ? `<video src="photos/${encodeURI(f)}" poster="photos/${encodeURI(f.replace(/\.mp4$/i,".jpg"))}" muted loop playsinline preload="metadata" aria-hidden="true"></video>`
-      : `<img src="photos/${encodeURI(f)}" alt="" loading="lazy" decoding="async" draggable="false">`).join("");
-    $("track").innerHTML=html+html;                       // дважды — для бесконечной прокрутки
-    $("track").querySelectorAll("video").forEach(v=>{ v.muted=true; if(!reduce) v.play().catch(()=>{}); });
-    $("track").style.setProperty("--dur",Math.max(20,list.length*6)+"s");
-    $("gallery").hidden=false;
+  // ---------- видео по очереди (список в config.js → videos) ----------
+  (function reel(){
+    const list=(window.BOOKING.videos||[]).filter(Boolean); if(!list.length) return;
+    const v=$("reelv"), dots=$("dots"), reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const url=f=>"media/"+encodeURI(f), poster=f=>"media/"+encodeURI(f.replace(/\.mp4$/i,".jpg"));
+    let i=0, visible=true;
+    v.muted=true; v.loop=list.length===1; if(reduce) v.controls=true;
+    dots.innerHTML=list.length>1?list.map(()=>"<i></i>").join(""):"";
+    function show(n){
+      i=(n+list.length)%list.length;
+      v.poster=poster(list[i]); v.src=url(list[i]); v.muted=true;
+      dots.querySelectorAll("i").forEach((d,k)=>d.classList.toggle("on",k===i));
+      if(!reduce && visible) v.play().catch(()=>{});
+      if(list.length>1) fetch(url(list[(i+1)%list.length])).catch(()=>{});     // подгружаем следующее заранее
+    }
+    v.addEventListener("ended",()=>{ if(list.length>1) show(i+1); });
+    v.addEventListener("click",()=>{ if(list.length>1) show(i+1); });
+    if("IntersectionObserver" in window) new IntersectionObserver(es=>{ visible=es[0].isIntersecting; if(!reduce){ visible?v.play().catch(()=>{}):v.pause(); } }).observe(v);
+    $("reel").hidden=false; show(0);
   })();
 
   // ---------- гирлянда и снег ----------
