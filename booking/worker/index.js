@@ -114,9 +114,10 @@ async function handleCheckout(request, env) {
     line_items: [{
       quantity: 1,
       price_data: { currency: "eur", unit_amount: pkg.deposit * 100,
-        product_data: { name: `Фотосессия ${pkg.minutes} мин, предоплата — ${date} ${time}` } }
+        product_data: { name: `Arrhes — séance photo ${pkg.minutes} min (Фотосессия ${pkg.minutes} мин) — ${date} ${time}` } }
     }],
     metadata: meta,
+    custom_text: { submit: { message: `Arrhes non remboursables en cas d'annulation par le client. Pas de droit de rétractation pour une séance à date fixe. CGV : ${site}/cgv.html` } },
     payment_intent_data: { description: `Фотосессия ${pkg.minutes} мин, ${date} ${time} — ${name} @${instagram}`, metadata: meta },
     client_reference_id: `${date}_${time.replace(":", "")}`,
     locale: lang,

@@ -100,6 +100,7 @@
   .secure{text-align:center;font-size:12px;color:#f1e3bd;opacity:.75;margin-top:8px}
   footer{margin:28px 0 0;text-align:center;font-size:13px;color:#f1e3bd;opacity:.85}
   footer a{color:inherit}
+  .check a{color:var(--green);font-weight:600}
   .toast{position:fixed;left:16px;right:16px;bottom:110px;max-width:488px;margin:0 auto;background:#fff;color:#222;padding:12px 14px;border-radius:12px;font-size:14px;z-index:9;display:none;box-shadow:0 6px 24px rgba(0,0,0,.4)}
   .who{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600}
   .stepper{display:flex;align-items:center;gap:6px}
@@ -186,12 +187,12 @@
       <div class="row"><span class="k" data-i="shoot"></span><span id="sumTotal"></span></div>
       <div class="row"><span class="k" data-i="onsite"></span><span id="sumRest"></span></div>
       <div class="row big"><span data-i="payNow"></span><span id="sumDep"></span></div>
-      <label class="check" id="agreeBox"><input type="checkbox" id="agree"><span data-i="agree"></span></label>
+      <label class="check" id="agreeBox"><input type="checkbox" id="agree"><span data-ih="agree"></span></label>
     </div>
     <div class="info"><span>🎄</span><span data-i="weather"></span></div>
   </section>
 
-  <footer><span data-i="questions"></span> <a id="igLink" target="_blank" rel="noopener"></a></footer>
+  <footer><span data-i="questions"></span> <a id="igLink" target="_blank" rel="noopener"></a><br><a href="cgv.html" data-i="legal"></a></footer>
 </main>
 
 <div class="bar">
@@ -220,7 +221,7 @@
       mac:"Хочу мини-работу с МАК-картами",
       stepYou:"Твои данные",stepPay:"Проверь и оплати предоплату",name:"Имя",insta:"Твой Instagram",phone:"Телефон для связи",
       when:"Когда",shoot:"Съёмка {min} мин",onsite:"Остаток на месте",payNow:"Платишь сейчас",
-      agree:"Понимаю, что предоплата {dep} € невозвратная. Остаток {rest} € оплачиваю на съёмке.",
+      legal:"Условия и юридическая информация (CGV)",agree:"Понимаю, что предоплата (arrhes) {dep} € остаётся у фотографа, если я откажусь от съёмки, и что 14-дневного права на отказ для съёмки на конкретную дату нет. Остаток {rest} € оплачиваю на съёмке. Принимаю <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">условия (CGV)</a>.",
       weather:"Съёмка проходит на улице. Если погода сложная — перенесём на другой фотодень, предоплата сохранится.",
       questions:"Вопросы? Пиши в Instagram",secure:"Оплата через Stripe · Apple Pay и Google Pay",
       btn:"Оплатить {dep} € и забронировать",btnPick:"Выбери день и время",
@@ -240,7 +241,7 @@
       mac:"I'd like a mini session with MAC cards",
       stepYou:"Your details",stepPay:"Review & pay the deposit",name:"Name",insta:"Your Instagram",phone:"Phone number",
       when:"When",shoot:"{min}-min session",onsite:"Balance on site",payNow:"Pay now",
-      agree:"I understand the {dep} € deposit is non-refundable. I'll pay the {rest} € balance at the shoot.",
+      legal:"Terms & legal notice (CGV)",agree:"I understand the {dep} € deposit (arrhes) is forfeited if I cancel, and that there is no 14-day right of withdrawal for a shoot on a specific date. I'll pay the {rest} € balance at the shoot. I accept the <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">terms (CGV)</a>.",
       weather:"The shoot is outdoors. If the weather is bad, we'll move you to another photo day — your deposit carries over.",
       questions:"Questions? DM on Instagram",secure:"Secure payment via Stripe · Apple Pay & Google Pay",
       btn:"Pay {dep} € & book",btnPick:"Pick a day and time",
@@ -260,7 +261,7 @@
       mac:"Je veux une mini-séance avec les cartes MAC",
       stepYou:"Tes coordonnées",stepPay:"Vérifie et paie l'acompte",name:"Prénom",insta:"Ton Instagram",phone:"Téléphone",
       when:"Quand",shoot:"Shooting {min} min",onsite:"Reste sur place",payNow:"À payer maintenant",
-      agree:"Je comprends que l'acompte de {dep} € n'est pas remboursable. Je paie les {rest} € restants sur place.",
+      legal:"CGV et mentions légales",agree:"Je comprends que les arrhes de {dep} € sont perdues si j'annule, et qu'il n'y a pas de droit de rétractation de 14 jours pour une séance à date fixe. Je paie les {rest} € restants sur place. J'accepte les <a href=\"cgv.html\" target=\"_blank\" rel=\"noopener\">CGV</a>.",
       weather:"Le shooting a lieu en extérieur. Si la météo est mauvaise, on te reporte à un autre jour — l'acompte reste valable.",
       questions:"Des questions ? Écris-moi sur Instagram",secure:"Paiement sécurisé via Stripe · Apple Pay et Google Pay",
       btn:"Payer {dep} € et réserver",btnPick:"Choisis un jour et une heure",
@@ -307,6 +308,7 @@
   function renderStatic(){
     document.documentElement.lang = lang;
     document.querySelectorAll("[data-i]").forEach(el=>el.textContent=t(el.dataset.i));
+    document.querySelectorAll("[data-ih]").forEach(el=>el.innerHTML=t(el.dataset.ih));
     $("pillDur").textContent = "⏱ "+C.packages.map(p=>p.minutes).join(" / ")+" "+T[lang].min;
     $("pillPrice").textContent = C.packages[0].price ? "💶 "+C.packages.map(p=>p.price).join(" / ")+" €" : "";
     document.querySelectorAll("[data-ph]").forEach(el=>el.placeholder=t(el.dataset.ph));
