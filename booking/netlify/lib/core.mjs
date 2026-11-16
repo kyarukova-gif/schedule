@@ -45,7 +45,7 @@ function corsHeaders(env) {
   };
 }
 const json = (env, obj, status = 200) =>
-  new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json", ...corsHeaders(env) } });
+  new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json; charset=utf-8", ...corsHeaders(env) } });
 
 async function takenSlots(env) {
   const out = [];
@@ -257,7 +257,11 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { headers: corsHeaders(env) });
     try {
       if (url.pathname === "/api/config" && request.method === "GET")
-        return json(env, { ...CONFIG, taken: await takenSlots(env), now: nowLocal() });
+        {
+        // В публичный ответ попадает только то, что нужно странице записи (контакты и ссылки для писем не отдаём)
+        const { packages, maxPeople, recommendedMaxFor30, slotMinutes, bufferMinutes, timezone, instagram, instagramPortfolio, days } = CONFIG;
+        return json(env, { packages, maxPeople, recommendedMaxFor30, slotMinutes, bufferMinutes, timezone, instagram, instagramPortfolio, days, taken: await takenSlots(env), now: nowLocal() });
+      }
       if (url.pathname === "/api/checkout" && request.method === "POST") return await handleCheckout(request, env);
       if (url.pathname === "/api/webhook" && request.method === "POST") return await handleWebhook(request, env);
     } catch (e) {

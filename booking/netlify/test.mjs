@@ -88,6 +88,10 @@ assert.equal(mails.length,before+1,"фотографу второй раз не 
   env.ALLOW_MAIL_RESEND="1"; const k="slot:2026-12-21 14:20"; const rec=JSON.parse(store.get(k)); delete rec.clientMailV; store.set(k,JSON.stringify(rec));
   assert.equal((await hook("checkout.session.completed","cs_20","2026-12-21 14:20")).status,200);
   assert.equal(clientMails.length,c0+1,"с флагом письмо уходит повторно"); delete env.ALLOW_MAIL_RESEND; }
+// --- публичный /api/config не отдаёт контакты и служебные настройки ---
+{ const j=await (await call("/api/config","GET")).json();
+  assert.ok(j.days.length && j.packages.length && Array.isArray(j.taken));
+  for (const bad of ["contact","whatsapp","meetingPoint","guideUrl","senderName","website"]) assert.ok(!(bad in j) && !JSON.stringify(j).includes("33634181505"), bad); }
 console.log("ALL OK");
 
 // --- обёртка Netlify Blobs: срок жизни и список ---
