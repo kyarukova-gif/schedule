@@ -14,9 +14,15 @@ const T = {
     when: "Когда", dur: "Длительность", people: "Участников", place: "Место", wishes: "Ваши пожелания", min: "мин",
     cal: "Добавить в Google Календарь", icsNote: "Для Apple Календаря и Outlook файл приложен к письму.",
     meet: "Где встречаемся", termsTitle: "Что важно знать",
-    t1: "Остаток {rest} € оплачивается на съёмке.",
-    t2: "Ретушь кожи и цветокоррекция. Готовые фотографии вы получите через 2 рабочих дня после съёмки.",
-    t3: "Предоплата {dep} € остаётся у фотографа, если вы откажетесь от съёмки. Если погода не позволит снимать, перенесём на другой фотодень, предоплата сохранится.",
+    photosTitle: "Фотографии",
+    ph1: "Готовые фотографии вы получите через 2 рабочих дня после съёмки.",
+    ph2: "Все фотографии придут одной ссылкой, удобной для скачивания, с ретушью кожи и цветокоррекцией.",
+    payTitle: "Оплата",
+    pay1: "Предоплата {dep} € невозвратна, если вы отменяете съёмку.",
+    pay2: "Остаток {rest} € оплачивается на съёмке.",
+    weatherTitle: "Погода и перенос",
+    w1: "Если погода не позволяет провести съёмку, она переносится на другой день по договорённости между вами и фотографом, при наличии свободного времени.",
+    w2: "Если вам не подходит ни одно время, предоплата возвращается.",
     terms: "Полные условия", guide: "Гайд по съёмке", contactTitle: "Связаться со мной",
     ig: "Instagram", mail: "Почта", wa: "WhatsApp", phone: "Телефон",
     event: "Фотосессия на Marché de Noël (Ницца)", evDesc: "Остаток {rest} € оплачивается на съёмке.",
@@ -28,9 +34,15 @@ const T = {
     when: "When", dur: "Duration", people: "People", place: "Place", wishes: "Your wishes", min: "min",
     cal: "Add to Google Calendar", icsNote: "For Apple Calendar and Outlook, the calendar file is attached to this email.",
     meet: "Where we meet", termsTitle: "Good to know",
-    t1: "The remaining {rest} € is paid at the shoot.",
-    t2: "Skin retouching and color correction. You'll receive the finished photos within 2 working days after the shoot.",
-    t3: "The {dep} € deposit is kept if you cancel the shoot. If the weather doesn't allow shooting, we'll move you to another photo day and your deposit carries over.",
+    photosTitle: "Photos",
+    ph1: "You'll receive the finished photos within 2 working days after the shoot.",
+    ph2: "All photos come in a single link that is easy to download, with skin retouching and color correction.",
+    payTitle: "Payment",
+    pay1: "The {dep} € deposit is non-refundable if you cancel the shoot.",
+    pay2: "The remaining {rest} € is paid at the shoot.",
+    weatherTitle: "Weather and rescheduling",
+    w1: "If the weather doesn't allow the shoot, it will be moved to another day by agreement between you and the photographer, subject to availability.",
+    w2: "If none of the options suits you, the deposit is refunded.",
     terms: "Full terms", guide: "Shoot guide", contactTitle: "Contact me",
     ig: "Instagram", mail: "Email", wa: "WhatsApp", phone: "Phone",
     event: "Photoshoot at the Marché de Noël (Nice)", evDesc: "The remaining {rest} € is paid at the shoot.",
@@ -42,9 +54,15 @@ const T = {
     when: "Quand", dur: "Durée", people: "Personnes", place: "Lieu", wishes: "Vos souhaits", min: "min",
     cal: "Ajouter à Google Agenda", icsNote: "Pour Apple Calendrier et Outlook, le fichier agenda est joint à cet e-mail.",
     meet: "Point de rendez-vous", termsTitle: "À savoir",
-    t1: "Le solde de {rest} € est à régler sur place, le jour de la séance.",
-    t2: "Retouche de la peau et colorimétrie. Vous recevrez les photos finalisées sous 2 jours ouvrés après la séance.",
-    t3: "Les arrhes de {dep} € restent acquises si vous annulez la séance. Si la météo ne permet pas de photographier, nous reportons à un autre jour et les arrhes restent valables.",
+    photosTitle: "Photos",
+    ph1: "Vous recevrez les photos finalisées sous 2 jours ouvrés après la séance.",
+    ph2: "Toutes les photos vous sont transmises par un lien unique, facile à télécharger, avec retouche de la peau et colorimétrie.",
+    payTitle: "Paiement",
+    pay1: "Les arrhes de {dep} € ne sont pas remboursables si vous annulez la séance.",
+    pay2: "Le solde de {rest} € est à régler sur place, le jour de la séance.",
+    weatherTitle: "Météo et report",
+    w1: "Si la météo ne permet pas de réaliser la séance, elle est reportée à un autre jour, d'un commun accord entre vous et la photographe, selon les disponibilités.",
+    w2: "Si aucun créneau ne vous convient, les arrhes sont remboursées.",
     terms: "Conditions complètes", guide: "Guide de la séance", contactTitle: "Me contacter",
     ig: "Instagram", mail: "E-mail", wa: "WhatsApp", phone: "Téléphone",
     event: "Séance photo au Marché de Noël (Nice)", evDesc: "Le solde de {rest} € est à régler sur place.",
@@ -112,6 +130,7 @@ export function buildClientMail(rec, { config, siteUrl }) {
     (solid ? `background:${C.red};color:#ffffff;` : `background:#ffffff;color:${C.night};border:2px solid ${C.line};`) + `">${esc(label)}</a>`;
   const row = (k, val) => `<tr><td style="padding:7px 0;color:${C.mute};font:14px ${font};width:38%;vertical-align:top">${esc(k)}</td><td style="padding:7px 0;color:${C.ink};font:600 15px ${font};vertical-align:top">${val}</td></tr>`;
   const h = txt => `<div style="margin:26px 0 8px;font:600 12px ${font};letter-spacing:.12em;text-transform:uppercase;color:${C.mute}">${esc(txt)}</div>`;
+  const sub = txt => `<div style="margin:14px 0 4px;font:700 14px ${font};color:${C.night}">${esc(txt)}</div>`;
   const li = txt => `<tr><td style="vertical-align:top;padding:4px 10px 4px 0;color:${C.gold};font:16px ${font}">✦</td><td style="padding:4px 0;color:${C.ink};font:15px/1.5 ${font}">${txt}</td></tr>`;
 
   const waDigits = String(contact.whatsapp || "").replace(/\D/g, "");
@@ -140,7 +159,9 @@ export function buildClientMail(rec, { config, siteUrl }) {
   <div style="margin-top:4px;font:12px/1.4 ${font};color:${C.mute}">${esc(t.icsNote)}</div>
   ${meeting ? h(t.meet) + `<div style="font:15px/1.5 ${font};color:${C.ink}">${esc(meeting)}</div>` : ""}
   ${h(t.termsTitle)}
-  <table role="presentation" cellpadding="0" cellspacing="0">${li(esc(fmt(t.t1, v)))}${li(esc(fmt(t.t2, v)))}${li(esc(fmt(t.t3, v)))}</table>
+  ${sub(t.photosTitle)}<table role="presentation" cellpadding="0" cellspacing="0">${li(esc(t.ph1))}${li(esc(t.ph2))}</table>
+  ${sub(t.payTitle)}<table role="presentation" cellpadding="0" cellspacing="0">${li(esc(fmt(t.pay1, v)))}${li(esc(fmt(t.pay2, v)))}</table>
+  ${sub(t.weatherTitle)}<table role="presentation" cellpadding="0" cellspacing="0">${li(esc(t.w1))}${li(esc(t.w2))}</table>
   <div style="margin-top:10px"><a href="${esc(site + "/cgv.html")}" style="font:14px ${font};color:${C.night}">${esc(t.terms)} →</a></div>
   ${guide ? `<div style="margin-top:18px">${btn(guide, t.guide)}</div>` : ""}
   ${h(t.contactTitle)}
@@ -151,7 +172,8 @@ export function buildClientMail(rec, { config, siteUrl }) {
 </table></td></tr></table></body></html>`;
 
   const text = [t.title, "", fmt(t.hello, v), "", `${t.when}: ${whenLong}`, `${t.dur}: ${rec.minutes} ${t.min}`, `${t.people}: ${rec.people}`, `${t.place}: ${place}`,
-    meeting ? `${t.meet}: ${meeting}` : "", "", `${t.cal}: ${gcal}`, "", t.termsTitle + ":", "- " + fmt(t.t1, v), "- " + fmt(t.t2, v), "- " + fmt(t.t3, v),
+    meeting ? `${t.meet}: ${meeting}` : "", "", `${t.cal}: ${gcal}`, "", t.termsTitle + ":", "", t.photosTitle + ":", "- " + t.ph1, "- " + t.ph2, "", t.payTitle + ":", "- " + fmt(t.pay1, v), "- " + fmt(t.pay2, v),
+    "", t.weatherTitle + ":", "- " + t.w1, "- " + t.w2, "",
     `${t.terms}: ${site}/cgv.html`, guide ? `${t.guide}: ${guide}` : "", "", t.contactTitle + ":", `Instagram: https://instagram.com/${ig}`,
     contact.email ? `${t.mail}: ${contact.email}` : "", waDigits ? `WhatsApp: https://wa.me/${waDigits}` : ""].filter(x => x !== "").join("\n");
 

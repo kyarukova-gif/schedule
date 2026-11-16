@@ -5,6 +5,9 @@
 import { CONFIG } from "./config.mjs";
 import { buildClientMail } from "./mail.mjs";
 
+// Версия письма клиенту. Если число увеличить, письмо будет отправлено повторно для существующих броней.
+// Меняй ТОЛЬКО до запуска (пока в списке нет настоящих клиентов).
+const CLIENT_MAIL_VERSION = 2;
 const HOLD_SECONDS = 31 * 60;          // Stripe требует, чтобы сессия жила минимум 30 минут
 const SESSION_SECONDS = 30 * 60 + 30;
 
@@ -205,7 +208,7 @@ async function handleWebhook(request, env) {
       const main = await env.SLOTS.get(keys[0], "json");
       const same = main && main.status === "booked" && main.session === s.id;
       const wantClient = typeof env.sendClientMail === "function";
-      if (same && main.emailed && (main.clientEmailed || !wantClient)) return new Response("ok"); // повтор события
+      if (same && main.emailed && (!wantClient || (main.clientEmailed && main.clientMailV === CLIENT_MAIL_VERSION))) return new Response("ok"); // повтор события
       const record = same ? main : {
         status: "booked", session: s.id, date, time, minutes, lang: m.lang || "ru", people: Number(m.people) || 1,
         price: Number(m.price), deposit: Number(m.deposit), name: m.name, instagram: m.instagram, phone: m.phone,
@@ -220,9 +223,9 @@ async function handleWebhook(request, env) {
           record.emailed = true;
           await env.SLOTS.put(keys[0], JSON.stringify(record));
         }
-        if (wantClient && record.email && !record.clientEmailed) {   // письмо клиенту
+        if (wantClient && record.email && (!record.clientEmailed || record.clientMailV !== CLIENT_MAIL_VERSION)) {   // письмо клиенту
           await env.sendClientMail(buildClientMail(record, { config: CONFIG, siteUrl: env.SITE_URL }));
-          record.clientEmailed = true;
+          record.clientEmailed = true; record.clientMailV = CLIENT_MAIL_VERSION;
           await env.SLOTS.put(keys[0], JSON.stringify(record));
         }
       } catch (e) {
