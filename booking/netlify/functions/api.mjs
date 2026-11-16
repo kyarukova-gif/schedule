@@ -15,6 +15,7 @@ export default async (request) => {
     RESEND_API_KEY: get("RESEND_API_KEY"),
     NOTIFY_EMAIL: get("NOTIFY_EMAIL"),
     MAIL_FROM: get("MAIL_FROM"),
+    ALLOW_MAIL_RESEND: get("ALLOW_MAIL_RESEND"),
     SITE_URL: get("URL")            // адрес сайта Netlify подставляет сам
   };
   // Письмо клиенту отправляется с Gmail-адреса фотографа (пароль приложения Google)

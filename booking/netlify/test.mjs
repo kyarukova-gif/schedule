@@ -81,6 +81,13 @@ assert.equal(mails.length,before+1,"фотографу второй раз не 
   assert.ok(decodeURIComponent(stripeCalls[n0]).includes("payment_method_types[1]=paypal"),"PayPal запрашивается");
   const n1=stripeCalls.length; rejectPaypal=true; r2=await call("/api/checkout","POST",{...base,date:"2026-12-01",time:"12:35"}); assert.equal(r2.status,200,"без PayPal оплата всё равно создаётся");
   assert.ok(!decodeURIComponent(stripeCalls[n1]).includes("paypal"),"повтор уже без PayPal"); rejectPaypal=false; }
+// --- письма по старым броням заново не уходят, пока не включён ALLOW_MAIL_RESEND ---
+{ const c0=clientMails.length, m0=mails.length;
+  assert.equal((await hook("checkout.session.completed","cs_20","2026-12-21 14:20")).status,200);
+  assert.equal(clientMails.length,c0); assert.equal(mails.length,m0);
+  env.ALLOW_MAIL_RESEND="1"; const k="slot:2026-12-21 14:20"; const rec=JSON.parse(store.get(k)); delete rec.clientMailV; store.set(k,JSON.stringify(rec));
+  assert.equal((await hook("checkout.session.completed","cs_20","2026-12-21 14:20")).status,200);
+  assert.equal(clientMails.length,c0+1,"с флагом письмо уходит повторно"); delete env.ALLOW_MAIL_RESEND; }
 console.log("ALL OK");
 
 // --- обёртка Netlify Blobs: срок жизни и список ---
