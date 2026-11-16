@@ -18,7 +18,7 @@ export const CONFIG = {
   // Для письма клиенту после оплаты
   contact: { email: "k.yarukova@gmail.com", whatsapp: "33634181505", phone: "" },   // whatsapp — только цифры с кодом страны, например 33612345678
   meetingPoint: { ru: "Под каруселью на Marché de Noël", en: "Under the carousel at the Marché de Noël", fr: "Sous le carrousel du Marché de Noël" },
-  guideUrl: "/media/guide.pdf",   // гайд по съёмке (лежит в папке media)
+  guideUrl: { ru: "/media/guide-ru.pdf", en: "/media/guide-en.pdf", fr: "/media/guide-fr.pdf" },   // гайд по съёмке, по языку клиента (папка media)
   senderName: "Katherine Grape",
 
   // Фотодни. date — YYYY-MM-DD, start/end — часы работы .

@@ -89,7 +89,8 @@ export function buildClientMail(rec, { config, siteUrl }) {
   const contact = config.contact || {};
   const ig = rec.instagramOwner || config.instagram;
   const site = (siteUrl || "").replace(/\/$/, "");
-  const guide = config.guideUrl ? (config.guideUrl.startsWith("/") ? site + config.guideUrl : config.guideUrl) : "";
+  const g0 = typeof config.guideUrl === "string" ? config.guideUrl : ((config.guideUrl && (config.guideUrl[lang] || config.guideUrl.ru)) || "");
+  const guide = g0 ? (g0.startsWith("/") ? site + g0 : g0) : "";
 
   // календарь
   const dtStart = zonedToUtc(rec.date, start, config.timezone), dtEnd = new Date(dtStart.getTime() + rec.minutes * 60000);

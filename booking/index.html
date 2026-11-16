@@ -422,10 +422,10 @@
     const slot=(q.get("slot")||"").replace(/[<>&"']/g,"");
     ov.innerHTML=`<div><div style="font-size:56px">🎄</div><h1 class="serif" style="font-style:italic;font-size:30px;margin:10px 0" id="pt"></h1>
       <p style="font-weight:600;margin:0 0 8px;color:var(--gold)">${slot}</p><p style="opacity:.85;max-width:340px;margin:0 auto 20px" id="pp"></p>
-      <a class="btn" style="position:static;text-align:center;text-decoration:none;margin-bottom:10px" id="pg" href="media/guide.pdf" target="_blank" rel="noopener"></a>
+      <a class="btn" style="position:static;text-align:center;text-decoration:none;margin-bottom:10px" id="pg" href="#" target="_blank" rel="noopener"></a>
       <button class="btn" style="position:static;background:transparent;border:2px solid rgba(224,178,90,.55);box-shadow:none" id="pc"></button></div>`;
     document.body.appendChild(ov);
-    $("pt").textContent=t("paidTitle"); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose"); $("pg").textContent=t("guide");
+    $("pt").textContent=t("paidTitle"); $("pp").textContent=t("paidText"); $("pc").textContent=t("paidClose"); $("pg").textContent=t("guide"); $("pg").href="media/guide-"+lang+".pdf";
     $("pc").onclick=()=>{ ov.remove(); history.replaceState(null,"",location.pathname); };
   }
 
