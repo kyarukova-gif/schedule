@@ -3,5 +3,5 @@
 window.BOOKING = {
   apiUrl: "",
   // Видео по очереди: имена файлов из папки booking/media/ (к каждому .mp4 нужна картинка с тем же именем .jpg)
-  videos: ["showreel.mp4"]
+  videos: ["showreel.mp4", "reel-2.mp4"]
 };
