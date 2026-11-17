@@ -111,13 +111,23 @@ async function handleCheckout(request, env) {
     name, instagram: "@" + instagram, phone, wishes: wishes || "-"
   };
   const site = (env.SITE_URL || "").replace(/\/$/, "");
-  const makeBody = types => stripeForm({
+  const dmy = date.split("-").reverse().join("/");
+  const itemName = {
+    ru: `Предоплата (arrhes) — фотосессия ${pkg.minutes} мин, ${dmy} ${time}`,
+    en: `Deposit (arrhes) — ${pkg.minutes}-min photoshoot, ${dmy} ${time}`,
+    fr: `Arrhes — séance photo ${pkg.minutes} min, ${dmy} ${time}`
+  }[meta.lang] || `Arrhes — séance photo ${pkg.minutes} min, ${dmy} ${time}`;
+  // Счёт-фактура Stripe после оплаты (на французском: это документ для Франции)
+  const invoiceDescription = `Séance photo au Marché de Noël (Nice) le ${dmy} à ${time}, ${pkg.minutes} min. ` +
+    `Prix de la séance : ${pkg.price} €. Arrhes versées : ${pkg.deposit} €. Solde à régler sur place : ${pkg.price - pkg.deposit} €. ` +
+    `Conditions : ${site}/cgv.html`;
+  const makeBody = (types, withInvoice = true) => stripeForm({
     mode: "payment",
     payment_method_types: types,   // card: карты, Apple Pay, Google Pay; paypal: PayPal
     line_items: [{
       quantity: 1,
       price_data: { currency: "eur", unit_amount: pkg.deposit * 100,
-        product_data: { name: `Booking deposit — ${pkg.minutes}-min photoshoot ${date} ${time}` } }
+        product_data: { name: itemName } }
     }],
     metadata: meta,
     custom_text: { submit: { message: `Booking deposit (arrhes): reserves your time slot and is credited against the price of the shoot. Non-refundable if you cancel. No 14-day withdrawal right for a shoot on a fixed date (art. L221-28, 12° French Consumer Code). In case of force majeure, rescheduling (not cancellation) is possible no later than 24 hours before the shoot. Terms: ${site}/cgv.html` } },
@@ -125,23 +135,26 @@ async function handleCheckout(request, env) {
     client_reference_id: `${date}_${time.replace(":", "")}`,
     customer_email: email,   // почта клиента подставляется в Stripe и получит чек
     locale: lang,
+    ...(withInvoice ? { invoice_creation: { enabled: true, invoice_data: { description: invoiceDescription, metadata: meta } } } : {}),
     expires_at: Math.floor(Date.now() / 1000) + SESSION_SECONDS,
     success_url: `${site}/?paid=1&slot=${encodeURIComponent(`${date} ${time}`)}`,
     cancel_url: `${site}/`
   });
 
-  const callStripe = types => fetch("https://api.stripe.com/v1/checkout/sessions", {
+  const callStripe = (types, withInvoice) => fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}`, "content-type": "application/x-www-form-urlencoded" },
-    body: makeBody(types)
+    body: makeBody(types, withInvoice)
   });
-  // PayPal появится на странице оплаты, как только его включат в Stripe.
-  // Пока он не включён, Stripe отклоняет такой запрос, и мы повторяем его только с картами.
-  let res = await callStripe(["card", "paypal"]);
-  let session = await res.json();
-  if (!res.ok && /payment_method|paypal/i.test(JSON.stringify(session.error || {}))) {
-    res = await callStripe(["card"]);
+  // Порядок попыток, чтобы оплата не ломалась из-за необязательного:
+  //   1) карты + PayPal + счёт-фактура; 2) без PayPal (если он не включён в Stripe); 3) без счёта (если у ключа нет прав на счета).
+  const attempts = [[["card", "paypal"], true], [["card"], true], [["card"], false]];
+  let res, session;
+  for (const [types, withInvoice] of attempts) {
+    res = await callStripe(types, withInvoice);
     session = await res.json();
+    if (res.ok) break;
+    if (!/payment_method|paypal|invoice|permission|restricted|scope/i.test(JSON.stringify(session.error || {}))) break;
   }
   if (!res.ok) {
     for (const k of keys) await env.SLOTS.delete(k);

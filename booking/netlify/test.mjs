@@ -12,10 +12,11 @@ const clientMails=[]; let clientFail=false;
 const env = { sendClientMail: async m => { if (clientFail) throw new Error("smtp down"); clientMails.push(m); }, SLOTS:KV, STRIPE_SECRET_KEY:"sk_test", STRIPE_WEBHOOK_SECRET:"whsec_x", SITE_URL:"https://x.io/booking",
               RESEND_API_KEY:"re_x", NOTIFY_EMAIL:"owner@example.com" };
 const stripeCalls=[], mails=[]; let mailFail=false, n=0;
-let rejectPaypal=false;
+let rejectPaypal=false, rejectInvoice=false;
 globalThis.fetch = async (url, opt) => {
   if (String(url).includes("resend")) { if(mailFail) return new Response("no",{status:500}); mails.push(JSON.parse(opt.body)); return new Response("{}",{status:200}); }
   if (rejectPaypal && opt.body.toString().includes("paypal")) return new Response(JSON.stringify({error:{message:"The payment method type provided: paypal is invalid. Please ensure the provided type is activated in your dashboard"}}),{status:400});
+  if (rejectInvoice && opt.body.toString().includes("invoice_creation")) return new Response(JSON.stringify({error:{message:"The provided key does not have the required permissions for this endpoint: invoices_write"}}),{status:403});
   stripeCalls.push(opt.body.toString());
   return new Response(JSON.stringify({id:"cs_"+(++n),url:"https://checkout.stripe.com/c/"+n}),{status:200});
 };
@@ -52,7 +53,7 @@ await hook("checkout.session.completed","cs_1","2026-12-11 13:45"); assert.equal
 
 // --- 60 мин блокирует две ячейки ---
 r = await call("/api/checkout","POST",{...base,time:"12:00",minutes:60,people:6}); assert.equal(r.status,200);
-assert.ok(dec(stripeCalls[1]).includes("unit_amount]=2000") && dec(stripeCalls[1]).includes("60-min photoshoot"));
+assert.ok(dec(stripeCalls[1]).includes("unit_amount]=2000") && dec(stripeCalls[1]).includes("séance photo 60 min"));
 let t = await taken(); assert.ok(t.includes("2026-12-11 12:00") && t.includes("2026-12-11 12:35"));
 assert.equal((await call("/api/checkout","POST",{...base,time:"12:35"})).status,409,"вторая ячейка часа занята");
 assert.equal((await call("/api/checkout","POST",{...base,time:"13:10"})).status,200,"следующая после часа свободна");
@@ -92,6 +93,14 @@ assert.equal(mails.length,before+1,"фотографу второй раз не 
 { const j=await (await call("/api/config","GET")).json();
   assert.ok(j.days.length && j.packages.length && Array.isArray(j.taken));
   for (const bad of ["contact","whatsapp","meetingPoint","guideUrl","senderName","website"]) assert.ok(!(bad in j) && !JSON.stringify(j).includes("33634181505"), bad); }
+// --- счёт-фактура: запрашивается; при отказе Stripe (нет прав на счета) оплата создаётся без неё ---
+{ const n0=stripeCalls.length;
+  let r3=await call("/api/checkout","POST",{...base,date:"2026-12-19",time:"14:20"}); assert.equal(r3.status,200);
+  const f0=dec(stripeCalls[n0]);
+  assert.ok(f0.includes("invoice_creation[enabled]=true")&&f0.includes("Solde à régler sur place : 80 €"),"счёт запрашивается с описанием остатка");
+  rejectInvoice=true; const n1=stripeCalls.length;
+  r3=await call("/api/checkout","POST",{...base,date:"2026-12-19",time:"14:55"}); assert.equal(r3.status,200,"без прав на счета оплата всё равно создаётся");
+  assert.ok(!dec(stripeCalls[stripeCalls.length-1]).includes("invoice_creation"),"последняя попытка без счёта"); rejectInvoice=false; }
 console.log("ALL OK");
 
 // --- обёртка Netlify Blobs: срок жизни и список ---
