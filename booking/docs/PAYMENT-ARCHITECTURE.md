@@ -64,6 +64,7 @@ booking/
 │     └─ kv.mjs            адаптер хранилища: Netlify Blobs с «временем жизни» записей
 │  └─ test.mjs             автотесты логики (запуск: node netlify/test.mjs)
 ├─ tools/guide/build.mjs   сборка PDF-гайда на 3 языках из текста + фото
+├─ docs/                   документация (этот файл); на сайте закрыта, из интернета не открывается
 └─ README.md               короткая инструкция запуска
 ```
 
@@ -318,7 +319,7 @@ booking/
 
 ### Заготовка задания для Claude (скопировать в новый чат)
 
-> Нужен лендинг с онлайн-оплатой. За основу возьми архитектуру из репозитория `kyarukova-gif/schedule`, ветка `claude/charming-davinci-53ag6d`, папка `booking/` и описание в файле `PAYMENT-ARCHITECTURE.md`: статическая страница + одна функция Netlify (`/api/checkout`, `/api/webhook`, `/api/config`) + Stripe Checkout + Netlify Blobs + письмо владельцу (Resend) и клиенту (Gmail SMTP). Ключи в код не клади, только в переменные окружения Netlify.
+> Нужен лендинг с онлайн-оплатой. За основу возьми архитектуру из репозитория `kyarukova-gif/schedule`, ветка `claude/charming-davinci-53ag6d`, папка `booking/` и описание в файле `booking/docs/PAYMENT-ARCHITECTURE.md`: статическая страница + одна функция Netlify (`/api/checkout`, `/api/webhook`, `/api/config`) + Stripe Checkout + Netlify Blobs + письмо владельцу (Resend) и клиенту (Gmail SMTP). Ключи в код не клади, только в переменные окружения Netlify.
 >
 > Чем мой новый лендинг отличается: **[описать: что продаю, цена, сколько тарифов, нужна ли запись на время, разовая оплата или подписка, валюта, языки, что клиент получает после оплаты, нужны ли счета/НДС, где хостинг]**.
 >
