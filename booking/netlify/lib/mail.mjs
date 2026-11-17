@@ -23,6 +23,7 @@ const T = {
     weatherTitle: "Погода и перенос",
     w1: "Если погода не позволяет провести съёмку, она переносится на другой день по договорённости между вами и фотографом, при наличии свободного времени.",
     w2: "Если вам не подходит ни одно время, предоплата возвращается.",
+    w3: "Перенос по форс-мажору (по вашей просьбе) возможен не позднее чем за 24 часа до съёмки. Это именно перенос, а не отмена: предоплата сохраняется за новым временем.",
     terms: "Полные условия", guide: "Гайд по съёмке", contactTitle: "Связаться со мной",
     ig: "Instagram", port: "Фотопортфолио", mail: "Почта", wa: "WhatsApp", phone: "Телефон",
     event: "Фотосессия на Marché de Noël (Ницца)", evDesc: "Остаток {rest} € оплачивается на съёмке.",
@@ -43,6 +44,7 @@ const T = {
     weatherTitle: "Weather and rescheduling",
     w1: "If the weather doesn't allow the shoot, it will be moved to another day by agreement between you and the photographer, subject to availability.",
     w2: "If none of the options suits you, the deposit is refunded.",
+    w3: "In case of force majeure, you can reschedule the shoot no later than 24 hours before it starts. This is a rescheduling, not a cancellation: your deposit carries over to the new time.",
     terms: "Full terms", guide: "Shoot guide", contactTitle: "Contact me",
     ig: "Instagram", port: "Photo portfolio", mail: "Email", wa: "WhatsApp", phone: "Phone",
     event: "Photoshoot at the Marché de Noël (Nice)", evDesc: "The remaining {rest} € is paid at the shoot.",
@@ -63,6 +65,7 @@ const T = {
     weatherTitle: "Météo et report",
     w1: "Si la météo ne permet pas de réaliser la séance, elle est reportée à un autre jour, d'un commun accord entre vous et la photographe, selon les disponibilités.",
     w2: "Si aucun créneau ne vous convient, les arrhes sont remboursées.",
+    w3: "En cas de force majeure, vous pouvez reporter la séance au plus tard 24 heures avant son début. Il s'agit d'un report et non d'une annulation : vos arrhes restent valables pour le nouveau créneau.",
     terms: "Conditions complètes", guide: "Guide de la séance", contactTitle: "Me contacter",
     ig: "Instagram", port: "Portfolio photo", mail: "E-mail", wa: "WhatsApp", phone: "Téléphone",
     event: "Séance photo au Marché de Noël (Nice)", evDesc: "Le solde de {rest} € est à régler sur place.",
@@ -162,7 +165,7 @@ export function buildClientMail(rec, { config, siteUrl }) {
   ${h(t.termsTitle)}
   ${sub(t.photosTitle)}<table role="presentation" cellpadding="0" cellspacing="0">${li(esc(t.ph1))}${li(esc(t.ph2))}</table>
   ${sub(t.payTitle)}<table role="presentation" cellpadding="0" cellspacing="0">${li(esc(fmt(t.pay1, v)))}${li(esc(fmt(t.pay2, v)))}</table>
-  ${sub(t.weatherTitle)}<table role="presentation" cellpadding="0" cellspacing="0">${li(esc(t.w1))}${li(esc(t.w2))}</table>
+  ${sub(t.weatherTitle)}<table role="presentation" cellpadding="0" cellspacing="0">${li(esc(t.w1))}${li(esc(t.w2))}${li(esc(t.w3))}</table>
   <div style="margin-top:10px"><a href="${esc(site + "/cgv.html")}" style="font:14px ${font};color:${C.night}">${esc(t.terms)} →</a></div>
   ${guide ? `<div style="margin-top:18px">${btn(guide, t.guide)}</div>` : ""}
   ${h(t.contactTitle)}
@@ -176,7 +179,7 @@ export function buildClientMail(rec, { config, siteUrl }) {
 
   const text = [t.title, "", fmt(t.hello, v), "", `${t.when}: ${whenLong}`, `${t.dur}: ${rec.minutes} ${t.min}`, `${t.people}: ${rec.people}`, `${t.place}: ${place}`,
     meeting ? `${t.meet}: ${meeting}` : "", "", `${t.cal}: ${gcal}`, "", t.termsTitle + ":", "", t.photosTitle + ":", "- " + t.ph1, "- " + t.ph2, "", t.payTitle + ":", "- " + fmt(t.pay1, v), "- " + fmt(t.pay2, v),
-    "", t.weatherTitle + ":", "- " + t.w1, "- " + t.w2, "",
+    "", t.weatherTitle + ":", "- " + t.w1, "- " + t.w2, "- " + t.w3, "",
     `${t.terms}: ${site}/cgv.html`, guide ? `${t.guide}: ${guide}` : "", "", t.contactTitle + ":", `Instagram: https://instagram.com/${ig}`, config.instagramPortfolio ? `${t.port}: https://instagram.com/${config.instagramPortfolio}` : "",
     contact.email ? `${t.mail}: ${contact.email}` : "", waDigits ? `WhatsApp: https://wa.me/${waDigits}` : "", config.website ? `${t.footer}: ${config.website}` : ""].filter(x => x !== "").join("\n");
 
