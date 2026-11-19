@@ -4,8 +4,8 @@
 export const CONFIG = {
   // Тарифы. deposit — невозвратная предоплата, остальное оплачивается на съёмке.
   packages: [
-    { minutes: 30, price: 100, deposit: 20 },   // 1–3 человека
-    { minutes: 60, price: 190, deposit: 20 }    // компании
+    { minutes: 30, price: 90,  deposit: 20 },   // 1–3 человека
+    { minutes: 60, price: 170, deposit: 20 }    // компании
   ],
   maxPeople: 15,            // максимум человек в одной записи
   recommendedMaxFor30: 3,   // с 4 человек страница советует взять час

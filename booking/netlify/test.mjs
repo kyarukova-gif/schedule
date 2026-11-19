@@ -25,7 +25,7 @@ const base = {date:"2026-12-11",time:"13:45",minutes:30,people:2,name:"Anna",ins
 const taken = async () => (await (await call("/api/config","GET")).json()).taken;
 const sign = raw => { const t=Math.floor(Date.now()/1000); return {"stripe-signature":`t=${t},v1=${createHmac("sha256","whsec_x").update(`${t}.${raw}`).digest("hex")}`}; };
 const hook = (type, id, slot, extra={}) => { const raw=JSON.stringify({type,data:{object:{id,payment_status:"paid",customer_details:{email:"a@b.co"},
-  metadata:{slot,minutes:"30",people:"2",price:"100",deposit:"20",name:"Anna",instagram:"@anna.photo",phone:"+33 6",wishes:"Хочу в красном платье <3",...extra}}}});
+  metadata:{slot,minutes:"30",people:"2",price:"90",deposit:"20",name:"Anna",instagram:"@anna.photo",phone:"+33 6",wishes:"Хочу в красном платье <3",...extra}}}});
   return call("/api/webhook","POST",raw,sign(raw)); };
 
 // --- валидация ---
@@ -97,7 +97,7 @@ assert.equal(mails.length,before+1,"фотографу второй раз не 
 { const n0=stripeCalls.length;
   let r3=await call("/api/checkout","POST",{...base,date:"2026-12-19",time:"14:20"}); assert.equal(r3.status,200);
   const f0=dec(stripeCalls[n0]);
-  assert.ok(f0.includes("invoice_creation[enabled]=true")&&f0.includes("Solde à régler sur place : 80 €"),"счёт запрашивается с описанием остатка");
+  assert.ok(f0.includes("invoice_creation[enabled]=true")&&f0.includes("Solde à régler sur place : 70 €"),"счёт запрашивается с описанием остатка");
   rejectInvoice=true; const n1=stripeCalls.length;
   r3=await call("/api/checkout","POST",{...base,date:"2026-12-19",time:"14:55"}); assert.equal(r3.status,200,"без прав на счета оплата всё равно создаётся");
   assert.ok(!dec(stripeCalls[stripeCalls.length-1]).includes("invoice_creation"),"последняя попытка без счёта"); rejectInvoice=false; }
